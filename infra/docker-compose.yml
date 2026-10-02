@@ -1,28 +1,12 @@
-﻿# ============================================================
-#  SmartTurril - Infraestructura MQTT
-#  Docker Compose para Eclipse Mosquitto
-# ============================================================
-version: '3.8'
+﻿version: '3.8'
 
 services:
   mosquitto:
-    image: eclipse-mosquitto:2.0
-    container_name: smartturril-mosquitto
-    restart: unless-stopped
+    image: eclipse-mosquitto:latest
+    container_name: smartturril_broker
     ports:
-      - "1883:1883"   # MQTT estandar (TCP) - Para el ESP32 y clientes MQTT
-      - "9001:9001"   # MQTT sobre WebSockets - Para el Dashboard Next.js
+      - "1883:1883"
+      - "9001:9001"
     volumes:
       - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - mosquitto_data:/mosquitto/data
-      - mosquitto_logs:/mosquitto/log
-    networks:
-      - smartturril-net
-
-networks:
-  smartturril-net:
-    driver: bridge
-
-volumes:
-  mosquitto_data:
-  mosquitto_logs:
+    restart: unless-stopped
