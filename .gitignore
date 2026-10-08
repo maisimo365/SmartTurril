@@ -1,0 +1,5 @@
+# Secrets
+firmware/secrets.h
+.env
+.env.*
+*.env

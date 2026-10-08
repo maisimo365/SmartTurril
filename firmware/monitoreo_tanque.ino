@@ -1,10 +1,11 @@
 ﻿#include <WiFi.h>
 #include <PubSubClient.h>
 
-// 1. Configura tus credenciales aqui
-const char* ssid = "TU_RED_WIFI";
-const char* password = "TU_PASSWORD";
-const char* mqtt_server = "IP_DE_TU_VPS"; // Usa la IP del VPS o de tu PC si es local
+// !!! CAMBIAR ESTOS VALORES LOCALMENTE !!!
+// No subir a Git ni compartir estas credenciales.
+const char* ssid = ""; //tu red wifi
+const char* password = ""; // tu contraseña de tu red wifi
+const char* mqtt_server = ""; // IP del VPS
 
 WiFiClient espClient;
 PubSubClient client(espClient);
