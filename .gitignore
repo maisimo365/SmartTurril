@@ -3,3 +3,6 @@ firmware/secrets.h
 .env
 .env.*
 *.env
+
+# Node
+node_modules/
