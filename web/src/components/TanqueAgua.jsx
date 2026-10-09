@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { CONFIG_TANQUE, UMBRALES_ALERTA } from '@/config/tanque';
+import CirculoProgreso from '@/components/CirculoProgreso';
+import TarjetaMedicion from '@/components/TarjetaMedicion';
 
 export default function TanqueAgua({ nivel }) {
   const { distanciaVacio, distanciaLleno, alturaTuboDesdeBase } = CONFIG_TANQUE;
@@ -8,17 +10,14 @@ export default function TanqueAgua({ nivel }) {
   
   const nivelClamped = Math.max(0, Math.min(100, nivel));
   
-  // Cálculos físicos basados en el firmware del ESP32
   const distanciaActual = distanciaVacio - (nivelClamped / 100) * (distanciaVacio - distanciaLleno);
   const alturaAguaDesdeBase = distanciaVacio - distanciaActual;
   
-  // Cálculo del porcentaje útil (excluyendo la zona del tubo)
   const alturaUtilTotal = distanciaVacio - alturaTuboDesdeBase;
   const porcentajeUtil = alturaAguaDesdeBase > alturaTuboDesdeBase 
     ? ((alturaAguaDesdeBase - alturaTuboDesdeBase) / alturaUtilTotal) * 100 
     : 0;
 
-  // Estado y colores
   let estadoTexto = 'Normal';
   let colorPrimario = '#3b82f6';
   let colorGradienteInicio = '#60a5fa';
@@ -30,7 +29,7 @@ export default function TanqueAgua({ nivel }) {
     colorPrimario = '#ef4444';
     colorGradienteInicio = '#f87171';
     colorGradienteFin = '#dc2626';
-    iconoEstado = '⚠️';
+    iconoEstado = '️';
   } else if (nivelClamped > criticoAlto) {
     estadoTexto = 'Riesgo de Desborde';
     colorPrimario = '#f59e0b';
@@ -39,7 +38,6 @@ export default function TanqueAgua({ nivel }) {
     iconoEstado = '⚡';
   }
 
-  // Historial para el gráfico
   const [historial, setHistorial] = useState([]);
   useEffect(() => {
     setHistorial(prev => {
@@ -48,63 +46,67 @@ export default function TanqueAgua({ nivel }) {
     });
   }, [nivelClamped]);
 
-  // Porcentaje visual de la zona del tubo
   const porcentajeVisualTubo = (alturaTuboDesdeBase / distanciaVacio) * 100;
 
   return (
     <div style={styles.contenedorPrincipal}>
-      <div style={styles.tarjeta}>
-        
-        {/* Header */}
-        <div style={styles.header}>
-          <h2 style={styles.titulo}>Monitor de Nivel</h2>
+      <div className="smartturril-tarjeta" style={styles.tarjeta}>
+        <div className="smartturril-header" style={styles.header}>
+          <h2 className="smartturril-titulo" style={styles.titulo}>Monitor de Nivel</h2>
           <div style={styles.indicadorEstado}>
             <span style={{...styles.iconoEstado, backgroundColor: colorPrimario}}>{iconoEstado}</span>
             <span style={styles.textoEstado}>{estadoTexto}</span>
           </div>
         </div>
 
-        {/* Contenido: Métricas y Tanque */}
-        <div style={styles.contenidoTanque}>
-          
-          {/* Columna de Métricas */}
-          <div style={styles.metricas}>
-            <div style={styles.metricaItem}>
-              <span style={styles.metricaLabel}>Nivel de Llenado</span>
-              <span style={{...styles.porcentajeGrande, color: colorPrimario}}>{nivelClamped}%</span>
+        <div className="smartturril-contenido" style={styles.contenidoTanque}>
+          <div style={styles.metricasMixtas}>
+            <div className="smartturril-fila-circulos" style={styles.filaCirculos}>
+              <CirculoProgreso
+                valor={nivelClamped}
+                maximo={100}
+                color={colorPrimario}
+                etiqueta="Nivel de Llenado"
+                unidad="%"
+              />
+              <CirculoProgreso
+                valor={porcentajeUtil}
+                maximo={100}
+                color={porcentajeUtil < 20 ? '#ef4444' : '#0ea5e9'}
+                etiqueta="Nivel útil"
+                unidad="%"
+              />
             </div>
-            <div style={styles.metricaItem}>
-              <span style={styles.metricaLabel}>Distancia al agua</span>
-              <span style={styles.valorMetrica}>{distanciaActual.toFixed(1)} cm</span>
-            </div>
-            <div style={styles.metricaItem}>
-              <span style={styles.metricaLabel}>Altura del agua</span>
-              <span style={styles.valorMetrica}>{alturaAguaDesdeBase.toFixed(1)} cm</span>
-            </div>
-            <div style={styles.metricaItem}>
-              <span style={styles.metricaLabel}>Nivel útil disponible</span>
-              <span style={{...styles.valorMetrica, color: porcentajeUtil < 20 ? '#ef4444' : colorPrimario}}>
-                {porcentajeUtil.toFixed(1)}%
-              </span>
+
+            <div className="smartturril-fila-tarjetas" style={styles.filaTarjetas}>
+              <TarjetaMedicion
+                valor={distanciaActual}
+                maximo={distanciaVacio}
+                color="#8b5cf6"
+                etiqueta="Distancia al agua"
+                unidad="cm"
+              />
+              <TarjetaMedicion
+                valor={alturaAguaDesdeBase}
+                maximo={distanciaVacio}
+                color="#10b981"
+                etiqueta="Altura del agua"
+                unidad="cm"
+              />
             </div>
           </div>
 
-          {/* Columna del Tanque Visual */}
-          <div style={styles.tanqueContainer}>
-            <div style={styles.tanque}>
-              
-              {/* Sensor en la parte superior */}
-              <div style={styles.sensor}>
-                <span style={styles.iconoSensor}>📡</span>
-                <span style={styles.textoSensor}>Sensor<br/>{distanciaVacio}cm</span>
+          <div className="smartturril-tanque-container" style={styles.tanqueContainer}>
+            <div className="smartturril-tanque" style={styles.tanque}>
+              <div className="smartturril-sensor" style={styles.sensor}>
+                <span style={styles.iconoSensor}></span>
+                <span className="smartturril-texto-sensor" style={styles.textoSensor}>Sensor<br/>{distanciaVacio}cm</span>
               </div>
 
-              {/* Zona del tubo (NO UTILIZABLE) */}
               <div style={{...styles.zonaTubo, height: `${porcentajeVisualTubo}%`}}>
                 <span style={styles.textoZonaTubo}>Zona<br/>Tubo<br/>({alturaTuboDesdeBase}cm)</span>
               </div>
 
-              {/* El líquido */}
               <div style={{
                 ...styles.liquido,
                 height: `${nivelClamped}%`,
@@ -113,8 +115,7 @@ export default function TanqueAgua({ nivel }) {
                 <div style={styles.onda}></div>
               </div>
               
-              {/* Marcas de medición */}
-              <div style={styles.marcas}>
+              <div className="smartturril-marcas" style={styles.marcas}>
                 {[100, 75, 50, 25, 0].map((marca) => (
                   <div key={marca} style={styles.marca}>
                     <span style={styles.marcaLinea}></span>
@@ -124,14 +125,12 @@ export default function TanqueAgua({ nivel }) {
               </div>
             </div>
             
-            {/* Indicador lateral */}
-            <div style={styles.indicadorLateral}>
+            <div className="smartturril-indicador-lateral" style={styles.indicadorLateral}>
               <span style={{...styles.indicadorNumero, color: colorPrimario}}>{nivelClamped}%</span>
             </div>
           </div>
         </div>
 
-        {/* Gráfico de historial */}
         <div style={styles.seccionGrafico}>
           <h3 style={styles.tituloGrafico}>Historial de profundidad</h3>
           <div style={styles.graficoContainer}>
@@ -163,12 +162,54 @@ export default function TanqueAgua({ nivel }) {
           0%, 100% { transform: translateY(0) scaleX(1); }
           50% { transform: translateY(-4px) scaleX(1.1); }
         }
+
+        @media (max-width: 768px) {
+          .smartturril-contenido {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 30px !important;
+          }
+          .smartturril-tanque-container {
+            align-items: center !important;
+          }
+          .smartturril-marcas {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .smartturril-tarjeta {
+            padding: 16px !important;
+          }
+          .smartturril-titulo {
+            font-size: 1.1rem !important;
+          }
+          .smartturril-fila-circulos {
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          .smartturril-fila-tarjetas {
+            flex-direction: column !important;
+          }
+          .smartturril-tanque {
+            width: 80px !important;
+            height: 260px !important;
+          }
+          .smartturril-indicador-lateral {
+            display: none !important;
+          }
+          .smartturril-sensor {
+            padding: 2px 6px !important;
+          }
+          .smartturril-texto-sensor {
+            font-size: 0.6rem !important;
+          }
+        }
       `}</style>
     </div>
   );
 }
 
-// Estilos
 const styles = {
   contenedorPrincipal: { display: 'flex', justifyContent: 'center', padding: '20px', width: '100%', maxWidth: '700px', margin: '0 auto' },
   tarjeta: { backgroundColor: '#ffffff', borderRadius: '20px', boxShadow: '0 10px 40px rgba(0,0,0,0.08)', padding: '24px', width: '100%', border: '1px solid #f1f5f9' },
@@ -178,7 +219,9 @@ const styles = {
   iconoEstado: { width: '22px', height: '22px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '12px', fontWeight: 'bold' },
   textoEstado: { fontSize: '0.875rem', fontWeight: '600', color: '#475569' },
   contenidoTanque: { display: 'flex', gap: '40px', marginBottom: '24px', alignItems: 'flex-start' },
-  metricas: { flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' },
+  metricasMixtas: { display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '24px' },
+  filaCirculos: { display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'space-around', padding: '16px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' },
+  filaTarjetas: { display: 'flex', gap: '16px', justifyContent: 'space-between' },
   metricaItem: { display: 'flex', flexDirection: 'column', gap: '6px' },
   metricaLabel: { fontSize: '0.875rem', color: '#64748b', fontWeight: '500' },
   porcentajeGrande: { fontSize: '2.5rem', fontWeight: '800', lineHeight: 1 },
