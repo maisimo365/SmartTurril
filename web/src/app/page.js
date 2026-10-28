@@ -71,7 +71,7 @@ export default function Home() {
 
       {/* Contenido Principal */}
       <main style={styles.mainContent}>
-        <TanqueAgua nivel={nivel} calibracion={calibracion} />
+        <TanqueAgua nivel={nivel} distanciaCm={distanciaCm} calibracion={calibracion} />
       </main>
 
       {/* Pie de página con información del sistema */}

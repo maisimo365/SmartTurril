@@ -2,18 +2,24 @@
 import { useState, useEffect } from 'react';
 import { CONFIG_TANQUE, UMBRALES_ALERTA } from '@/config/tanque';
 
-export default function TanqueAgua({ nivel = 0, calibracion }) {
+export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion }) {
   const distanciaVacio = calibracion?.distanciaVacio ?? CONFIG_TANQUE.distanciaVacio;
   const distanciaLleno = calibracion?.distanciaLleno ?? CONFIG_TANQUE.distanciaLleno;
   const { alturaTuboDesdeBase, capacidadLitros = 1000 } = CONFIG_TANQUE;
   const { criticoBajo, criticoAlto } = UMBRALES_ALERTA;
 
-  const nivelClamped = Math.max(0, Math.min(100, Math.round(nivel * 10) / 10));
+  // Si recibimos distanciaCm en vivo, calculamos el porcentaje con la calibración activa
+  let nivelCalculado = nivel;
+  if (distanciaCm !== null && distanciaVacio > distanciaLleno) {
+    const rango = distanciaVacio - distanciaLleno;
+    nivelCalculado = ((distanciaVacio - distanciaCm) / rango) * 100;
+  }
 
-  const distanciaActual = Math.max(
-    0,
-    distanciaVacio - (nivelClamped / 100) * (distanciaVacio - distanciaLleno)
-  );
+  const nivelClamped = Math.max(0, Math.min(100, Math.round(nivelCalculado * 10) / 10));
+
+  const distanciaActual = distanciaCm !== null
+    ? Math.round(distanciaCm * 10) / 10
+    : Math.max(0, distanciaVacio - (nivelClamped / 100) * (distanciaVacio - distanciaLleno));
   const alturaAguaDesdeBase = Math.max(0, distanciaVacio - distanciaActual);
 
   const alturaUtilTotal = Math.max(1, distanciaVacio - alturaTuboDesdeBase);
