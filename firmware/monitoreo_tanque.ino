@@ -6,10 +6,13 @@
 const int TRIG_PIN = 5;
 const int ECHO_PIN = 18;
 
-// 2. Calibración del Tanque (en centímetros)
-//    Ajusta estos valores según tu tanque físico
-const float DISTANCIA_VACIO_CM = 100.0;  // Distancia cuando el tanque está vacío
-const float DISTANCIA_LLENO_CM = 2.0;   // Distancia cuando el tanque está lleno
+// 2. Calibración del Tanque — HU-06
+//    Medir con regla desde el sensor hasta la base interior del contenedor.
+//    DISTANCIA_VACIO_CM : distancia (cm) al fondo cuando el tanque está completamente vacío.
+//    DISTANCIA_LLENO_CM : distancia (cm) al agua en el punto de llenado máximo permitido.
+//                         DEBE ser >= 3–5 cm para respetar el punto ciego del HC-SR04.
+const float DISTANCIA_VACIO_CM = 100.0; // ← Ajustar: fondo del prototipo (cm)
+const float DISTANCIA_LLENO_CM = 5.0;  // ← Ajustar: nivel máximo permitido (mín. 3–5 cm desde el sensor)
 
 // ============================================================
 // 3. Credenciales de Red y Broker MQTT (AWS)
@@ -98,9 +101,15 @@ float medirDistancia() {
   return duracion * 0.0343 / 2.0;
 }
 
-// Función para calcular porcentaje de llenado
+// Función para calcular porcentaje de llenado — HU-06
+// Mapea la distancia leída dentro del rango [DISTANCIA_VACIO_CM, DISTANCIA_LLENO_CM]
+// y aplica clamping estricto: nunca < 0% ni > 100%.
 int calcularNivel(float distancia) {
-  float porcentaje = (DISTANCIA_VACIO_CM - distancia) / (DISTANCIA_VACIO_CM - DISTANCIA_LLENO_CM) * 100.0;
+  // Distancia grande → tanque vacío (0%) | Distancia pequeña → tanque lleno (100%)
+  float rango = DISTANCIA_VACIO_CM - DISTANCIA_LLENO_CM;
+  float porcentaje = (DISTANCIA_VACIO_CM - distancia) / rango * 100.0;
+
+  // Clamping: evita valores negativos (por debajo del vacío) o > 100% (desbordamiento)
   porcentaje = constrain(porcentaje, 0.0, 100.0);
   return (int)round(porcentaje);
 }
@@ -110,7 +119,11 @@ void setup() {
   delay(1000);
 
   Serial.println("======================================");
-  Serial.println("  SmartTurril - Hardware Real v1.0   ");
+  Serial.println("  SmartTurril - Hardware Real v1.1   ");
+  Serial.println("  HU-06: Calibración de niveles       ");
+  Serial.println("======================================");
+  Serial.print("  Vacío  (0%):  >= "); Serial.print(DISTANCIA_VACIO_CM); Serial.println(" cm");
+  Serial.print("  Lleno (100%): <= "); Serial.print(DISTANCIA_LLENO_CM); Serial.println(" cm");
   Serial.println("======================================");
 
   pinMode(TRIG_PIN, OUTPUT);
