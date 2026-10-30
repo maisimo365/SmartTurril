@@ -31,10 +31,10 @@ export default function useMQTT() {
       clientRef.current = client;
 
       client.on('connect', () => {
-        console.log('✅ Conectado al broker MQTT');
-        setStatus('Conectado ✅');
+        console.log('[MQTT] Conectado al broker');
+        setStatus('Conectado');
         client.subscribe(topic, { qos: 0 }, (err) => {
-          if (err) console.error('❌ Error al suscribirse:', err);
+          if (err) console.error('[MQTT] Error al suscribirse:', err);
         });
       });
 
@@ -43,28 +43,28 @@ export default function useMQTT() {
           try {
             const data = JSON.parse(message.toString());
             if (typeof data.nivel === 'number') {
-              console.log('📊 Nivel recibido:', data.nivel);
+              console.log('[MQTT] Nivel recibido:', data.nivel);
               setNivel(data.nivel);
             }
             if (typeof data.distancia_cm === 'number') {
               setDistanciaCm(data.distancia_cm);
             }
           } catch (e) {
-            console.error('Error al parsear mensaje:', e);
+            console.error('[MQTT] Error al parsear mensaje:', e);
           }
         }
       });
 
       client.on('error', (err) => {
-        console.error('❌ Error de MQTT:', err);
+        console.error('[MQTT] Error:', err);
         setStatus('Error de conexión');
       });
 
-      client.on('offline', () => setStatus('Desconectado ❌'));
-      client.on('reconnect', () => setStatus('Reconectando... 🔄'));
+      client.on('offline', () => setStatus('Desconectado'));
+      client.on('reconnect', () => setStatus('Reconectando'));
 
     } catch (error) {
-      console.error('Error al crear cliente MQTT:', error);
+      console.error('[MQTT] Error al crear cliente:', error);
       setStatus('Error inicializando');
     }
 
