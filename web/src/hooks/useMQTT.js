@@ -4,6 +4,7 @@ import mqtt from 'mqtt';
 
 export default function useMQTT() {
   const [nivel, setNivel] = useState(0);
+  const [distanciaCm, setDistanciaCm] = useState(null);
   const [status, setStatus] = useState('Desconectado');
   const clientRef = useRef(null);
 
@@ -26,7 +27,7 @@ export default function useMQTT() {
         reconnectPeriod: 5000,
         connectTimeout: 10000,
       });
-      
+
       clientRef.current = client;
 
       client.on('connect', () => {
@@ -44,6 +45,9 @@ export default function useMQTT() {
             if (typeof data.nivel === 'number') {
               console.log('📊 Nivel recibido:', data.nivel);
               setNivel(data.nivel);
+            }
+            if (typeof data.distancia_cm === 'number') {
+              setDistanciaCm(data.distancia_cm);
             }
           } catch (e) {
             console.error('Error al parsear mensaje:', e);
@@ -71,5 +75,5 @@ export default function useMQTT() {
     };
   }, []);
 
-  return { nivel, status };
+  return { nivel, distanciaCm, status };
 }
