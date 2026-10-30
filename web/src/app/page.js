@@ -1,12 +1,17 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useMQTT from '@/hooks/useMQTT';
 import TanqueAgua from '@/components/TanqueAgua';
-import ModalCalibracion from '@/components/ModalCalibracion';
+import ModalCalibracion, { leerCalibracion } from '@/components/ModalCalibracion';
 
 export default function Home() {
   const { nivel, status } = useMQTT();
   const [modalAbierto, setModalAbierto] = useState(false);
+  const [calibracion, setCalibracion] = useState(null);
+
+  useEffect(() => {
+    setCalibracion(leerCalibracion());
+  }, []);
 
   return (
     <main style={{
@@ -31,7 +36,7 @@ export default function Home() {
         </button>
       </header>
 
-      <TanqueAgua nivel={nivel} />
+      <TanqueAgua nivel={nivel} calibracion={calibracion} />
 
       <footer style={{
         textAlign: 'center',
@@ -44,7 +49,7 @@ export default function Home() {
       <ModalCalibracion
         abierto={modalAbierto}
         onCerrar={() => setModalAbierto(false)}
-        onGuardar={() => { }}
+        onGuardar={(nueva) => setCalibracion(nueva)}
       />
     </main>
   );

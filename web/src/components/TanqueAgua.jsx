@@ -4,18 +4,20 @@ import { CONFIG_TANQUE, UMBRALES_ALERTA } from '@/config/tanque';
 import CirculoProgreso from '@/components/CirculoProgreso';
 import TarjetaMedicion from '@/components/TarjetaMedicion';
 
-export default function TanqueAgua({ nivel }) {
-  const { distanciaVacio, distanciaLleno, alturaTuboDesdeBase } = CONFIG_TANQUE;
+export default function TanqueAgua({ nivel, calibracion }) {
+  const distanciaVacio = calibracion?.distanciaVacio ?? CONFIG_TANQUE.distanciaVacio;
+  const distanciaLleno = calibracion?.distanciaLleno ?? CONFIG_TANQUE.distanciaLleno;
+  const { alturaTuboDesdeBase } = CONFIG_TANQUE;
   const { criticoBajo, criticoAlto } = UMBRALES_ALERTA;
-  
+
   const nivelClamped = Math.max(0, Math.min(100, nivel));
-  
+
   const distanciaActual = distanciaVacio - (nivelClamped / 100) * (distanciaVacio - distanciaLleno);
   const alturaAguaDesdeBase = distanciaVacio - distanciaActual;
-  
+
   const alturaUtilTotal = distanciaVacio - alturaTuboDesdeBase;
-  const porcentajeUtil = alturaAguaDesdeBase > alturaTuboDesdeBase 
-    ? ((alturaAguaDesdeBase - alturaTuboDesdeBase) / alturaUtilTotal) * 100 
+  const porcentajeUtil = alturaAguaDesdeBase > alturaTuboDesdeBase
+    ? ((alturaAguaDesdeBase - alturaTuboDesdeBase) / alturaUtilTotal) * 100
     : 0;
 
   let estadoTexto = 'Normal';
@@ -54,7 +56,7 @@ export default function TanqueAgua({ nivel }) {
         <div className="smartturril-header" style={styles.header}>
           <h2 className="smartturril-titulo" style={styles.titulo}>Monitor de Nivel</h2>
           <div style={styles.indicadorEstado}>
-            <span style={{...styles.iconoEstado, backgroundColor: colorPrimario}}>{iconoEstado}</span>
+            <span style={{ ...styles.iconoEstado, backgroundColor: colorPrimario }}>{iconoEstado}</span>
             <span style={styles.textoEstado}>{estadoTexto}</span>
           </div>
         </div>
@@ -100,11 +102,11 @@ export default function TanqueAgua({ nivel }) {
             <div className="smartturril-tanque" style={styles.tanque}>
               <div className="smartturril-sensor" style={styles.sensor}>
                 <span style={styles.iconoSensor}></span>
-                <span className="smartturril-texto-sensor" style={styles.textoSensor}>Sensor<br/>{distanciaVacio}cm</span>
+                <span className="smartturril-texto-sensor" style={styles.textoSensor}>Sensor<br />{distanciaVacio}cm</span>
               </div>
 
-              <div style={{...styles.zonaTubo, height: `${porcentajeVisualTubo}%`}}>
-                <span style={styles.textoZonaTubo}>Zona<br/>Tubo<br/>({alturaTuboDesdeBase}cm)</span>
+              <div style={{ ...styles.zonaTubo, height: `${porcentajeVisualTubo}%` }}>
+                <span style={styles.textoZonaTubo}>Zona<br />Tubo<br />({alturaTuboDesdeBase}cm)</span>
               </div>
 
               <div style={{
@@ -114,7 +116,7 @@ export default function TanqueAgua({ nivel }) {
               }}>
                 <div style={styles.onda}></div>
               </div>
-              
+
               <div className="smartturril-marcas" style={styles.marcas}>
                 {[100, 75, 50, 25, 0].map((marca) => (
                   <div key={marca} style={styles.marca}>
@@ -124,9 +126,9 @@ export default function TanqueAgua({ nivel }) {
                 ))}
               </div>
             </div>
-            
+
             <div className="smartturril-indicador-lateral" style={styles.indicadorLateral}>
-              <span style={{...styles.indicadorNumero, color: colorPrimario}}>{nivelClamped}%</span>
+              <span style={{ ...styles.indicadorNumero, color: colorPrimario }}>{nivelClamped}%</span>
             </div>
           </div>
         </div>
@@ -150,7 +152,7 @@ export default function TanqueAgua({ nivel }) {
             </svg>
           </div>
           <div style={styles.leyendaGrafico}>
-            <button style={{...styles.botonLeyenda, backgroundColor: colorPrimario}}>Tiempo real</button>
+            <button style={{ ...styles.botonLeyenda, backgroundColor: colorPrimario }}>Tiempo real</button>
             <button style={styles.botonLeyendaInactivo}>Por hora</button>
             <button style={styles.botonLeyendaInactivo}>Por día</button>
           </div>
