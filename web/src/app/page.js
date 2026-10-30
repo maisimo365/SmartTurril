@@ -5,7 +5,7 @@ import TanqueAgua from '@/components/TanqueAgua';
 import ModalCalibracion, { leerCalibracion } from '@/components/ModalCalibracion';
 
 export default function Home() {
-  const { nivel, status } = useMQTT();
+  const { nivel, distanciaCm, status } = useMQTT();
   const [modalAbierto, setModalAbierto] = useState(false);
   const [calibracion, setCalibracion] = useState(null);
 
@@ -48,6 +48,7 @@ export default function Home() {
       </footer>
       <ModalCalibracion
         abierto={modalAbierto}
+        distanciaActual={distanciaCm}
         onCerrar={() => setModalAbierto(false)}
         onGuardar={(nueva) => setCalibracion(nueva)}
       />
