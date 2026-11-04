@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { CONFIG_TANQUE, UMBRALES_ALERTA } from '@/config/tanque';
 
 export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion }) {
@@ -61,13 +61,13 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
   // Historial de profundidad
   const [historial, setHistorial] = useState([]);
   const [filtroTiempo, setFiltroTiempo] = useState('real');
+  const [prevNivel, setPrevNivel] = useState(nivelClamped);
 
-  useEffect(() => {
-    setHistorial(prev => {
-      const nuevo = [...prev, { nivel: nivelClamped, timestamp: new Date() }];
-      return nuevo.length > 25 ? nuevo.slice(-25) : nuevo;
-    });
-  }, [nivelClamped]);
+  if (nivelClamped !== prevNivel) {
+    setPrevNivel(nivelClamped);
+    const nuevo = [...historial, { nivel: nivelClamped, timestamp: new Date() }];
+    setHistorial(nuevo.length > 25 ? nuevo.slice(-25) : nuevo);
+  }
 
   // Dimensiones del visor dentro del tanque SVG
   // El cuerpo cilíndrico del tanque va desde Y=125 hasta Y=395 (altura = 270px)
