@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const CLAVE_STORAGE = 'smartturril_calibracion';
 const MARGEN_LLENO_CM = 5; // Margen de seguridad superior (punto ciego HC-SR04)
@@ -15,14 +15,17 @@ export function leerCalibracion() {
 }
 
 export default function ModalCalibracion({ abierto, distanciaActual, onCerrar, onGuardar }) {
-  const [calibracionActual, setCalibracionActual] = useState(null);
+  const [calibracionActual, setCalibracionActual] = useState(leerCalibracion);
   const [ok, setOk] = useState(false);
+  const [prevAbierto, setPrevAbierto] = useState(abierto);
 
-  useEffect(() => {
-    if (!abierto) return;
-    setOk(false);
-    setCalibracionActual(leerCalibracion());
-  }, [abierto]);
+  if (abierto !== prevAbierto) {
+    setPrevAbierto(abierto);
+    if (abierto) {
+      setOk(false);
+      setCalibracionActual(leerCalibracion());
+    }
+  }
 
   function autocalibrarFondo() {
     if (!distanciaActual || distanciaActual <= MARGEN_LLENO_CM) return;
@@ -137,26 +140,46 @@ export default function ModalCalibracion({ abierto, distanciaActual, onCerrar, o
 }
 
 const s = {
-  overlay: { position: 'fixed', inset: 0, backgroundColor: 'rgba(15,23,42,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)', padding: '1rem', fontFamily: 'inherit' },
-  modal: { backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 20px 45px rgba(0,0,0,0.12)', width: '100%', maxWidth: '440px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', border: '1px solid #e2e8f0' },
+  overlay: { position: 'fixed', inset: 0, backgroundColor: 'rgba(3, 14, 27, 0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(6px)', padding: '1rem', fontFamily: 'inherit' },
+  modal: {
+    background: 'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #bae6fd 0%, #38bdf8 50%, #0284c7 100%) border-box',
+    borderRadius: '16px',
+    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3), 0 0 20px rgba(56, 189, 248, 0.25)',
+    width: '100%',
+    maxWidth: '440px',
+    padding: '24px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    border: '2px solid transparent',
+    color: '#0f172a'
+  },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
   tituloWrapper: { display: 'flex', alignItems: 'center', gap: '10px' },
   titulo: { margin: 0, fontSize: '1.15rem', fontWeight: '700', color: '#0f172a' },
-  btnX: { background: '#f1f5f9', border: 'none', borderRadius: '8px', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b', transition: 'background-color 0.15s' },
-  hint: { margin: 0, fontSize: '0.875rem', color: '#64748b', lineHeight: '1.5' },
-  panelLectura: { backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' },
+  btnX: { background: '#f0f9ff', border: 'none', borderRadius: '8px', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#0284c7', transition: 'background-color 0.15s' },
+  hint: { margin: 0, fontSize: '0.875rem', color: '#475569', lineHeight: '1.5' },
+  panelLectura: {
+    background: 'linear-gradient(180deg, #f8fafc 0%, #f0f9ff 100%)',
+    border: '1.5px solid #bae6fd',
+    borderRadius: '12px',
+    padding: '16px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px'
+  },
   lecturaHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
   labelLiveWrapper: { display: 'flex', alignItems: 'center', gap: '6px' },
-  labelLive: { fontSize: '0.85rem', color: '#475569', fontWeight: '500' },
-  valorLive: { fontSize: '1.25rem', color: '#0284c7', fontWeight: '700' },
+  labelLive: { fontSize: '0.85rem', color: '#0369a1', fontWeight: '600' },
+  valorLive: { fontSize: '1.3rem', color: '#0284c7', fontWeight: '800' },
   barraContainer: { height: '10px', backgroundColor: '#e2e8f0', borderRadius: '999px', overflow: 'hidden' },
   barraFill: { height: '100%', backgroundColor: '#0284c7', borderRadius: '999px', transition: 'width 0.4s ease' },
-  subInfo: { display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#94a3b8' },
-  calibracionGuardada: { display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#475569', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '10px 14px' },
+  subInfo: { display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#64748b' },
+  calibracionGuardada: { display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#166534', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '10px 14px' },
   footer: { display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '6px' },
-  btnCancelar: { padding: '9px 18px', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#fff', color: '#475569', fontWeight: '600', cursor: 'pointer', fontSize: '0.875rem' },
-  btnCapturar: { padding: '9px 20px', borderRadius: '8px', border: 'none', backgroundColor: '#0284c7', color: '#fff', fontWeight: '600', cursor: 'pointer', fontSize: '0.875rem', transition: 'background-color 0.2s', display: 'flex', alignItems: 'center', gap: '6px' },
+  btnCancelar: { padding: '9px 18px', borderRadius: '8px', border: '1px solid #cbd5e1', backgroundColor: '#f8fafc', color: '#475569', fontWeight: '600', cursor: 'pointer', fontSize: '0.875rem' },
+  btnCapturar: { padding: '9px 20px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)', color: '#fff', fontWeight: '700', cursor: 'pointer', fontSize: '0.875rem', transition: 'background-color 0.2s', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 8px rgba(2, 132, 199, 0.35)' },
   btnContent: { display: 'flex', alignItems: 'center', gap: '6px' },
-  btnDisabled: { backgroundColor: '#94a3b8', cursor: 'not-allowed' },
-  btnOk: { backgroundColor: '#10b981', cursor: 'default' },
+  btnDisabled: { backgroundColor: '#94a3b8', background: '#94a3b8', cursor: 'not-allowed' },
+  btnOk: { backgroundColor: '#10b981', background: '#10b981', cursor: 'default' },
 };

@@ -2,17 +2,21 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-// 1. Configuración de Pines del Sensor HC-SR04
+// 1. Configuración de Pines del Sensor HC-SR04 y LEDs
 const int TRIG_PIN = 5;
 const int ECHO_PIN = 18;
+
+// Pines para los LEDs indicadores (usar los pines 22 y 23)
+const int LED_ROJO_PIN  = 23; // LED Rojo: <= 20% o >= 80%
+const int LED_VERDE_PIN = 22; // LED Verde: 21% a 79%
 
 // 2. Calibración del Tanque — HU-06
 //    Medir con regla desde el sensor hasta la base interior del contenedor.
 //    DISTANCIA_VACIO_CM : distancia (cm) al fondo cuando el tanque está completamente vacío.
 //    DISTANCIA_LLENO_CM : distancia (cm) al agua en el punto de llenado máximo permitido.
 //                         DEBE ser >= 3–5 cm para respetar el punto ciego del HC-SR04.
-const float DISTANCIA_VACIO_CM = 100.0; // ← Ajustar: fondo del prototipo (cm)
-const float DISTANCIA_LLENO_CM = 5.0;  // ← Ajustar: nivel máximo permitido (mín. 3–5 cm desde el sensor)
+const float DISTANCIA_VACIO_CM = 33.0; // ← Fondo real del prototipo vacío (cm)
+const float DISTANCIA_LLENO_CM = 5.0;   // ← Nivel máximo permitido (mín. 3–5 cm desde el sensor)
 
 // ============================================================
 // 3. Credenciales de Red y Broker MQTT (AWS)
@@ -114,6 +118,19 @@ int calcularNivel(float distancia) {
   return (int)round(porcentaje);
 }
 
+// Función para controlar los LEDs según el nivel de agua
+void actualizarLeds(int nivel) {
+  // LED Rojo: <= 20% (crítico bajo) o >= 80% (crítico alto / desborde)
+  // LED Verde: 21% a 79% (rango normal y seguro)
+  if (nivel <= 20 || nivel >= 80) {
+    digitalWrite(LED_ROJO_PIN, HIGH);
+    digitalWrite(LED_VERDE_PIN, LOW);
+  } else {
+    digitalWrite(LED_ROJO_PIN, LOW);
+    digitalWrite(LED_VERDE_PIN, HIGH);
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   delay(1000);
@@ -129,6 +146,12 @@ void setup() {
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
   digitalWrite(TRIG_PIN, LOW);
+
+  // Configuración de pines de los LEDs
+  pinMode(LED_ROJO_PIN, OUTPUT);
+  pinMode(LED_VERDE_PIN, OUTPUT);
+  digitalWrite(LED_ROJO_PIN, LOW);
+  digitalWrite(LED_VERDE_PIN, LOW);
 
   setupWiFi();
 
@@ -151,6 +174,9 @@ void loop() {
     Serial.println("[SENSOR] Error: No se recibio eco. Verifica el cableado.");
   } else {
     int nivel = calcularNivel(distancia);
+
+    // Actualizar estado de LEDs físicos
+    actualizarLeds(nivel);
 
     // ==============================================================
     // HU 5 - Fase 1: Payload con distancia BRUTA en cm
