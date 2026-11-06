@@ -36,29 +36,29 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
   const litrosTotales = Math.round((nivelClamped / 100) * capacidadLitros);
   const litrosUtiles = Math.round((porcentajeUtil / 100) * (alturaUtilTotal / distanciaVacio) * capacidadLitros);
 
-  // Estados y colores profesionales
+  // Estados y colores profesionales acordes a la paleta azul zafiro / cian
   let estadoKey = 'normal';
   let estadoTexto = 'Nivel Normal';
-  let colorPrimario = '#0284c7'; // Azul profesional
-  let colorFondoBadge = '#e0f2fe';
-  let colorTextoBadge = '#0369a1';
+  let colorPrimario = '#38bdf8'; // Celeste cian vibrante
+  let colorFondoBadge = 'rgba(56, 189, 248, 0.15)';
+  let colorTextoBadge = '#38bdf8';
   let colorGradienteAguaInicio = '#38bdf8';
   let colorGradienteAguaFin = '#0284c7';
 
   if (nivelClamped < criticoBajo) {
     estadoKey = 'critico';
     estadoTexto = 'Nivel Crítico';
-    colorPrimario = '#ef4444'; // Rojo alarma
-    colorFondoBadge = '#fee2e2';
-    colorTextoBadge = '#b91c1c';
+    colorPrimario = '#f87171'; // Rojo alarma
+    colorFondoBadge = 'rgba(239, 68, 68, 0.2)';
+    colorTextoBadge = '#fca5a5';
     colorGradienteAguaInicio = '#f87171';
     colorGradienteAguaFin = '#dc2626';
   } else if (nivelClamped > criticoAlto) {
     estadoKey = 'alerta';
     estadoTexto = 'Riesgo de Desborde';
-    colorPrimario = '#f59e0b'; // Ámbar advertencia
-    colorFondoBadge = '#fef3c7';
-    colorTextoBadge = '#b45309';
+    colorPrimario = '#fbbf24'; // Ámbar advertencia
+    colorFondoBadge = 'rgba(245, 158, 11, 0.2)';
+    colorTextoBadge = '#fde047';
     colorGradienteAguaInicio = '#fbbf24';
     colorGradienteAguaFin = '#d97706';
   }
@@ -159,10 +159,24 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
           </div>
         </div>
 
-        {/* Ilustración SVG del Tanque Industrial Idéntico a la Imagen */}
+        {/* Indicador de Nivel Hero destacado (ideal para celular) */}
+        <div style={styles.nivelHero} className="smartturril-nivel-hero">
+          <div style={styles.nivelHeroNumeroWrapper}>
+            <span style={styles.nivelHeroNumero}>{nivelClamped}</span>
+            <span style={styles.nivelHeroPct}>%</span>
+          </div>
+          <div style={styles.nivelHeroInfo}>
+            <span style={styles.nivelHeroLabel}>Nivel de Almacenamiento</span>
+            <span style={{ ...styles.nivelHeroSubinfo, color: colorPrimario }}>
+              {estadoTexto} • {porcentajeUtil.toFixed(1)}% útil ({litrosTotales.toLocaleString()} L)
+            </span>
+          </div>
+        </div>
+
+        {/* Ilustración SVG del Tanque Industrial con mediciones por fuera */}
         <div style={styles.tanqueSvgWrapper}>
           <svg
-            viewBox="0 0 340 440"
+            viewBox="-50 0 440 440"
             style={styles.tanqueSvg}
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -436,32 +450,20 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
                 />
               ))}
 
-              {/* ESCALA DE GRADUACIÓN NUMÉRICA (% Y TICAS) */}
+              {/* TICAS SUBTILES INTERNAS DE CRISTAL */}
               {[100, 75, 50, 25, 0].map((pct) => {
                 const tickY = tankBottomY - (pct / 100) * tankHeight;
                 return (
-                  <g key={`tick-${pct}`}>
-                    <line
-                      x1="123"
-                      y1={tickY}
-                      x2="133"
-                      y2={tickY}
-                      stroke="#ffffff"
-                      strokeWidth="1.5"
-                      strokeOpacity="0.75"
-                    />
-                    <text
-                      x="137"
-                      y={tickY + 3.5}
-                      fill="#ffffff"
-                      fillOpacity="0.9"
-                      fontSize="9"
-                      fontWeight="600"
-                      fontFamily="Roboto, sans-serif"
-                    >
-                      {pct}%
-                    </text>
-                  </g>
+                  <line
+                    key={`tick-${pct}`}
+                    x1="123"
+                    y1={tickY}
+                    x2="132"
+                    y2={tickY}
+                    stroke="#ffffff"
+                    strokeWidth="1.2"
+                    strokeOpacity="0.4"
+                  />
                 );
               })}
 
@@ -516,26 +518,62 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               />
             </g>
 
-            {/* Etiqueta flotante con el nivel actual sobre el visor */}
-            <g transform={`translate(170, ${Math.min(tankBottomY - 24, Math.max(tankTopY + 24, waterTopY))})`}>
+            {/* ESCALA NUMÉRICA EXTERNA EN PORCENTAJES (Visible en mobile por fuera) */}
+            {[100, 75, 50, 25, 0].map((pct) => {
+              const tickY = tankBottomY - (pct / 100) * tankHeight;
+              return (
+                <g key={`escala-ext-${pct}`}>
+                  {/* Línea horizontal hacia la pared del tanque */}
+                  <line
+                    x1="32"
+                    y1={tickY}
+                    x2="50"
+                    y2={tickY}
+                    stroke="#ffffff"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeOpacity="0.9"
+                  />
+                  {/* Número de porcentaje grande en el exterior */}
+                  <text
+                    x="24"
+                    y={tickY + 5.5}
+                    textAnchor="end"
+                    fill="#ffffff"
+                    fontSize="15"
+                    fontWeight="800"
+                    fontFamily="Roboto, sans-serif"
+                    style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.6))' }}
+                  >
+                    {pct}%
+                  </text>
+                </g>
+              );
+            })}
+
+            {/* INDICADOR EXTERNO DEL NIVEL ACTUAL (Apunta directamente a la superficie del agua) */}
+            <g transform={`translate(290, ${waterTopY})`}>
+              <line x1="0" y1="0" x2="14" y2="0" stroke="#ffffff" strokeWidth="2.5" strokeOpacity="0.9" />
+              <polygon points="0,0 8,-4 8,4" fill="#ffffff" />
               <rect
-                x="-36"
-                y="-13"
+                x="14"
+                y="-14"
                 width="72"
-                height="24"
-                rx="12"
-                fill="#0f172a"
-                fillOpacity="0.92"
-                stroke={colorPrimario}
-                strokeWidth="1.5"
+                height="28"
+                rx="8"
+                fill="#072b4f"
+                fillOpacity="0.95"
+                stroke="#38bdf8"
+                strokeWidth="2"
+                style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.45))' }}
               />
               <text
-                x="0"
-                y="4"
+                x="50"
+                y="5"
                 textAnchor="middle"
                 fill="#ffffff"
-                fontSize="12"
-                fontWeight="700"
+                fontSize="14"
+                fontWeight="800"
                 fontFamily="Roboto, sans-serif"
               >
                 {nivelClamped}%
@@ -555,7 +593,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
           <div style={styles.resumenDivisor} />
           <div style={styles.resumenItem}>
             <span style={styles.resumenLabel}>Volumen Útil</span>
-            <span style={{ ...styles.resumenValor, color: porcentajeUtil < 20 ? '#ef4444' : '#0284c7' }}>
+            <span style={{ ...styles.resumenValor, color: porcentajeUtil < 20 ? '#f87171' : '#38bdf8' }}>
               {litrosUtiles.toLocaleString()} <span style={styles.resumenUnidad}>L</span>
             </span>
           </div>
@@ -577,7 +615,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
           <div style={styles.tarjetaMetrica}>
             <div style={styles.tarjetaHeader}>
               <span style={styles.tarjetaEtiqueta}>Nivel de Llenado</span>
-              <div style={{ ...styles.tarjetaIcono, backgroundColor: '#f0f9ff', color: '#0284c7' }}>
+              <div style={{ ...styles.tarjetaIcono, backgroundColor: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                 </svg>
@@ -600,20 +638,20 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
           <div style={styles.tarjetaMetrica}>
             <div style={styles.tarjetaHeader}>
               <span style={styles.tarjetaEtiqueta}>Nivel Útil Real</span>
-              <div style={{ ...styles.tarjetaIcono, backgroundColor: '#f0fdf4', color: '#16a34a' }}>
+              <div style={{ ...styles.tarjetaIcono, backgroundColor: 'rgba(52, 211, 153, 0.15)', color: '#34d399' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                 </svg>
               </div>
             </div>
             <div style={styles.tarjetaValorWrapper}>
-              <span style={{ ...styles.tarjetaValor, color: porcentajeUtil < 20 ? '#ef4444' : '#16a34a' }}>
+              <span style={{ ...styles.tarjetaValor, color: porcentajeUtil < 20 ? '#f87171' : '#34d399' }}>
                 {porcentajeUtil.toFixed(1)}
               </span>
               <span style={styles.tarjetaUnidad}>%</span>
             </div>
             <div style={styles.tarjetaBarraFondo}>
-              <div style={{ ...styles.tarjetaBarraProgreso, width: `${porcentajeUtil}%`, backgroundColor: porcentajeUtil < 20 ? '#ef4444' : '#16a34a' }} />
+              <div style={{ ...styles.tarjetaBarraProgreso, width: `${porcentajeUtil}%`, backgroundColor: porcentajeUtil < 20 ? '#f87171' : '#34d399' }} />
             </div>
             <span style={styles.tarjetaSubinfo}>Sobre toma de agua ({alturaTuboDesdeBase} cm)</span>
           </div>
@@ -622,7 +660,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
           <div style={styles.tarjetaMetrica}>
             <div style={styles.tarjetaHeader}>
               <span style={styles.tarjetaEtiqueta}>Distancia al Agua</span>
-              <div style={{ ...styles.tarjetaIcono, backgroundColor: '#faf5ff', color: '#9333ea' }}>
+              <div style={{ ...styles.tarjetaIcono, backgroundColor: 'rgba(168, 85, 247, 0.15)', color: '#c084fc' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <polyline points="12 6 12 12 16 14" />
@@ -630,7 +668,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               </div>
             </div>
             <div style={styles.tarjetaValorWrapper}>
-              <span style={{ ...styles.tarjetaValor, color: '#0f172a' }}>
+              <span style={{ ...styles.tarjetaValor, color: '#ffffff' }}>
                 {distanciaActual.toFixed(1)}
               </span>
               <span style={styles.tarjetaUnidad}>cm</span>
@@ -639,7 +677,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               <div style={{
                 ...styles.tarjetaBarraProgreso,
                 width: `${Math.min(100, (distanciaActual / distanciaVacio) * 100)}%`,
-                backgroundColor: '#9333ea'
+                backgroundColor: '#a855f7'
               }} />
             </div>
             <span style={styles.tarjetaSubinfo}>Sensor a superficie libre</span>
@@ -649,7 +687,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
           <div style={styles.tarjetaMetrica}>
             <div style={styles.tarjetaHeader}>
               <span style={styles.tarjetaEtiqueta}>Altura de Agua</span>
-              <div style={{ ...styles.tarjetaIcono, backgroundColor: '#ecfdf5', color: '#059669' }}>
+              <div style={{ ...styles.tarjetaIcono, backgroundColor: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="19" x2="12" y2="5" />
                   <polyline points="5 12 12 5 19 12" />
@@ -657,7 +695,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               </div>
             </div>
             <div style={styles.tarjetaValorWrapper}>
-              <span style={{ ...styles.tarjetaValor, color: '#0f172a' }}>
+              <span style={{ ...styles.tarjetaValor, color: '#ffffff' }}>
                 {alturaAguaDesdeBase.toFixed(1)}
               </span>
               <span style={styles.tarjetaUnidad}>cm</span>
@@ -666,7 +704,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               <div style={{
                 ...styles.tarjetaBarraProgreso,
                 width: `${Math.min(100, (alturaAguaDesdeBase / distanciaVacio) * 100)}%`,
-                backgroundColor: '#059669'
+                backgroundColor: '#38bdf8'
               }} />
             </div>
             <span style={styles.tarjetaSubinfo}>Desde el fondo ({distanciaVacio} cm máx)</span>
@@ -712,9 +750,9 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               </defs>
 
               {/* Líneas horizontales de guía */}
-              <line x1="0" y1="20" x2="500" y2="20" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="0" y1="60" x2="500" y2="60" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="0" y1="100" x2="500" y2="100" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="0" y1="20" x2="500" y2="20" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="0" y1="100" x2="500" y2="100" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="1" strokeDasharray="3 3" />
 
               {/* Guía de Alerta Crítica (Línea roja discontinua a 20%) */}
               <line
@@ -722,7 +760,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
                 y1={120 - (criticoBajo / 100) * 120}
                 x2="500"
                 y2={120 - (criticoBajo / 100) * 120}
-                stroke="#fca5a5"
+                stroke="#ef4444"
                 strokeWidth="1"
                 strokeDasharray="4 4"
               />
@@ -810,18 +848,18 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
 const styles = {
   dashboardContainer: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(320px, 400px) minmax(360px, 1fr)',
+    gridTemplateColumns: 'minmax(320px, 420px) minmax(360px, 1fr)',
     gap: '24px',
     maxWidth: '1180px',
     margin: '0 auto',
     alignItems: 'start',
   },
   tanqueCard: {
-    backgroundColor: '#ffffff',
-    background: 'radial-gradient(ellipse at center, #ffffff 65%, #f0f9ff 100%)',
+    background: 'linear-gradient(150deg, #62aade 0%, #4697d6 50%, #2b7bc0 100%)',
     borderRadius: '16px',
-    border: '1.5px solid #bfdbfe',
-    boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.05), inset 0 0 24px rgba(186, 230, 253, 0.45)',
+    border: 'none',
+    boxShadow: '0 8px 30px rgba(15, 60, 110, 0.22)',
+    backdropFilter: 'blur(8px)',
     padding: '24px',
     display: 'flex',
     flexDirection: 'column',
@@ -832,7 +870,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '16px',
+    marginBottom: '14px',
   },
   headerTitleGroup: {
     display: 'flex',
@@ -840,16 +878,17 @@ const styles = {
   },
   cardSubtitle: {
     fontSize: '0.75rem',
-    fontWeight: '500',
-    color: '#64748b',
+    fontWeight: '600',
+    color: '#f0f9ff',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
   },
   cardTitle: {
-    fontSize: '1.15rem',
-    fontWeight: '700',
-    color: '#0f172a',
+    fontSize: '1.2rem',
+    fontWeight: '800',
+    color: '#ffffff',
     margin: 0,
+    textShadow: '0 1px 2px rgba(10, 45, 80, 0.25)',
   },
   badgeEstado: {
     display: 'inline-flex',
@@ -858,29 +897,74 @@ const styles = {
     padding: '6px 12px',
     borderRadius: '999px',
     fontSize: '0.8rem',
+    fontWeight: '700',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+  },
+  nivelHero: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '14px',
+    background: 'linear-gradient(180deg, rgba(10, 45, 85, 0.78) 0%, rgba(6, 30, 60, 0.88) 100%)',
+    borderRadius: '12px',
+    border: 'none',
+    padding: '10px 16px',
+    marginBottom: '8px',
+  },
+  nivelHeroNumeroWrapper: {
+    display: 'flex',
+    alignItems: 'baseline',
+  },
+  nivelHeroNumero: {
+    fontSize: '2.4rem',
+    fontWeight: '800',
+    color: '#ffffff',
+    lineHeight: 1,
+    letterSpacing: '-1px',
+  },
+  nivelHeroPct: {
+    fontSize: '1.3rem',
+    fontWeight: '700',
+    color: '#38bdf8',
+    marginLeft: '2px',
+  },
+  nivelHeroInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+  },
+  nivelHeroLabel: {
+    fontSize: '0.8rem',
+    fontWeight: '700',
+    color: '#ffffff',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+  },
+  nivelHeroSubinfo: {
+    fontSize: '0.75rem',
     fontWeight: '600',
   },
   tanqueSvgWrapper: {
     width: '100%',
-    maxWidth: '340px',
+    maxWidth: '380px',
     display: 'flex',
     justifyContent: 'center',
-    padding: '10px 0',
+    padding: '6px 0',
   },
   tanqueSvg: {
     width: '100%',
     height: 'auto',
     maxHeight: '380px',
-    filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.06))',
+    filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.25))',
   },
   resumenTanque: {
     width: '100%',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#f8fafc',
+    background: 'linear-gradient(180deg, rgba(10, 45, 85, 0.78) 0%, rgba(6, 30, 60, 0.88) 100%)',
     borderRadius: '12px',
-    border: '1px solid #bae6fd',
+    border: 'none',
     padding: '12px 16px',
     marginTop: '16px',
   },
@@ -892,24 +976,24 @@ const styles = {
   },
   resumenLabel: {
     fontSize: '0.725rem',
-    color: '#64748b',
-    fontWeight: '500',
+    color: '#bae6fd',
+    fontWeight: '600',
     marginBottom: '2px',
   },
   resumenValor: {
     fontSize: '1.05rem',
     fontWeight: '700',
-    color: '#0f172a',
+    color: '#ffffff',
   },
   resumenUnidad: {
     fontSize: '0.75rem',
     fontWeight: '500',
-    color: '#64748b',
+    color: '#7dd3fc',
   },
   resumenDivisor: {
     width: '1px',
     height: '24px',
-    backgroundColor: '#e2e8f0',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
   },
   metricasColumna: {
     display: 'flex',
@@ -922,12 +1006,12 @@ const styles = {
     gap: '16px',
   },
   tarjetaMetrica: {
-    backgroundColor: '#ffffff',
-    background: 'radial-gradient(ellipse at center, #ffffff 60%, #f0f9ff 100%)',
+    background: 'linear-gradient(150deg, #62aade 0%, #4697d6 50%, #2b7bc0 100%)',
     borderRadius: '14px',
-    border: '1.5px solid #bfdbfe',
+    border: 'none',
     padding: '18px',
-    boxShadow: '0 2px 8px -1px rgba(15, 23, 42, 0.04), inset 0 0 18px rgba(186, 230, 253, 0.45)',
+    boxShadow: '0 8px 25px rgba(15, 60, 110, 0.2)',
+    backdropFilter: 'blur(8px)',
     display: 'flex',
     flexDirection: 'column',
   },
@@ -938,9 +1022,9 @@ const styles = {
     marginBottom: '8px',
   },
   tarjetaEtiqueta: {
-    fontSize: '0.8rem',
-    fontWeight: '600',
-    color: '#64748b',
+    fontSize: '0.85rem',
+    fontWeight: '700',
+    color: '#ffffff',
   },
   tarjetaIcono: {
     width: '32px',
@@ -958,18 +1042,19 @@ const styles = {
   },
   tarjetaValor: {
     fontSize: '1.85rem',
-    fontWeight: '700',
+    fontWeight: '800',
     lineHeight: 1,
+    color: '#ffffff',
   },
   tarjetaUnidad: {
     fontSize: '0.9rem',
     fontWeight: '600',
-    color: '#94a3b8',
+    color: '#e0f2fe',
   },
   tarjetaBarraFondo: {
     width: '100%',
     height: '6px',
-    backgroundColor: '#f1f5f9',
+    backgroundColor: 'rgba(255, 255, 255, 0.28)',
     borderRadius: '999px',
     overflow: 'hidden',
     marginBottom: '6px',
@@ -981,16 +1066,16 @@ const styles = {
   },
   tarjetaSubinfo: {
     fontSize: '0.725rem',
-    color: '#94a3b8',
-    fontWeight: '400',
+    color: '#f0f9ff',
+    fontWeight: '500',
   },
   graficoCard: {
-    backgroundColor: '#ffffff',
-    background: 'radial-gradient(ellipse at center, #ffffff 65%, #f0f9ff 100%)',
+    background: 'linear-gradient(150deg, #62aade 0%, #4697d6 50%, #2b7bc0 100%)',
     borderRadius: '16px',
-    border: '1.5px solid #bfdbfe',
+    border: 'none',
     padding: '20px',
-    boxShadow: '0 2px 10px -2px rgba(15, 23, 42, 0.04), inset 0 0 24px rgba(186, 230, 253, 0.45)',
+    boxShadow: '0 8px 25px rgba(15, 60, 110, 0.2)',
+    backdropFilter: 'blur(8px)',
   },
   graficoHeader: {
     display: 'flex',
@@ -1000,45 +1085,46 @@ const styles = {
   },
   graficoTitulo: {
     fontSize: '1rem',
-    fontWeight: '700',
-    color: '#0f172a',
+    fontWeight: '800',
+    color: '#ffffff',
     margin: 0,
   },
   graficoSubtitulo: {
     fontSize: '0.75rem',
-    color: '#64748b',
+    color: '#f0f9ff',
     margin: '2px 0 0 0',
   },
   controlesGrafico: {
     display: 'flex',
     gap: '6px',
-    backgroundColor: '#f8fafc',
+    background: 'linear-gradient(180deg, rgba(10, 45, 85, 0.85) 0%, rgba(6, 30, 60, 0.92) 100%)',
     padding: '3px',
     borderRadius: '8px',
-    border: '1px solid #e2e8f0',
+    border: 'none',
   },
   btnFiltro: {
     padding: '4px 10px',
     borderRadius: '6px',
     border: 'none',
     backgroundColor: 'transparent',
-    color: '#64748b',
+    color: '#bae6fd',
     fontSize: '0.75rem',
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
   },
   btnFiltroActivo: {
-    backgroundColor: '#ffffff',
-    color: '#0f172a',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+    backgroundColor: '#38bdf8',
+    color: '#072b4f',
+    fontWeight: '700',
+    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
   },
   svgGraficoContainer: {
     width: '100%',
     height: '110px',
-    backgroundColor: '#f8fafc',
+    background: 'linear-gradient(180deg, rgba(10, 45, 85, 0.85) 0%, rgba(6, 30, 60, 0.92) 100%)',
     borderRadius: '10px',
-    border: '1px solid #f1f5f9',
+    border: 'none',
     overflow: 'hidden',
     padding: '4px',
   },
@@ -1057,7 +1143,7 @@ const styles = {
     alignItems: 'center',
     gap: '6px',
     fontSize: '0.75rem',
-    color: '#64748b',
+    color: '#ffffff',
   },
   leyendaDot: {
     width: '8px',
@@ -1068,11 +1154,11 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 1fr)',
     gap: '10px',
-    backgroundColor: '#ffffff',
-    background: 'radial-gradient(ellipse at center, #ffffff 60%, #f0f9ff 100%)',
+    background: 'linear-gradient(150deg, #62aade 0%, #4697d6 50%, #2b7bc0 100%)',
     borderRadius: '12px',
-    border: '1.5px solid #bfdbfe',
-    boxShadow: 'inset 0 0 16px rgba(186, 230, 253, 0.4)',
+    border: 'none',
+    boxShadow: '0 8px 25px rgba(15, 60, 110, 0.2)',
+    backdropFilter: 'blur(8px)',
     padding: '14px 16px',
   },
   fichaItem: {
@@ -1082,13 +1168,13 @@ const styles = {
   },
   fichaLabel: {
     fontSize: '0.7rem',
-    color: '#94a3b8',
-    fontWeight: '500',
+    color: '#f0f9ff',
+    fontWeight: '600',
     textTransform: 'uppercase',
   },
   fichaValor: {
     fontSize: '0.85rem',
-    fontWeight: '600',
-    color: '#334155',
+    fontWeight: '700',
+    color: '#ffffff',
   },
 };
