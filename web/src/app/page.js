@@ -21,16 +21,45 @@ export default function Home() {
           <div style={styles.brandGroup}>
             <div style={styles.logoIcon}>
               <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
+                width="30"
+                height="30"
+                viewBox="0 0 64 64"
                 fill="none"
-                stroke="#ffffff"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                {/* Base oval inferior oscura */}
+                <ellipse cx="32" cy="56" rx="24" ry="5.5" fill="#091b2e" />
+
+                {/* Cuerpo cilíndrico celeste */}
+                <path
+                  d="M 14 18 C 14 13 21 11 32 11 C 43 11 50 13 50 18 L 50 49 C 50 54 42 56 32 56 C 22 56 14 54 14 49 Z"
+                  fill="#38bdf8"
+                />
+
+                {/* Interior del borde superior */}
+                <path
+                  d="M 14 18 C 14 14 21 17 32 17 C 43 17 50 14 50 18 C 50 22 43 25 32 25 C 21 25 14 22 14 18 Z"
+                  fill="#091b2e"
+                />
+                <ellipse cx="32" cy="18" rx="16" ry="4.5" fill="#0e2a47" />
+
+                {/* Reborde superior celeste brillante */}
+                <path
+                  d="M 14 18 C 14 12 20 10 32 10 C 44 10 50 12 50 18 C 47 16 41 15 32 15 C 23 15 17 16 14 18 Z"
+                  fill="#7dd3fc"
+                />
+
+                {/* Marco rectangular blanco en la cara frontal */}
+                <rect x="17" y="24" width="30" height="26" rx="2" fill="#ffffff" />
+
+                {/* Ventana interior azul marino profundo */}
+                <rect x="19.5" y="26.5" width="25" height="21" rx="1.5" fill="#0b1d30" />
+
+                {/* Gota de agua blanca en el centro */}
+                <path
+                  d="M 32 30 C 32 30 25.5 38 25.5 40.5 C 25.5 43.8 28.4 45.5 32 45.5 C 35.6 45.5 38.5 43.8 38.5 40.5 C 38.5 38 32 30 32 30 Z"
+                  fill="#ffffff"
+                />
               </svg>
             </div>
             <div>
@@ -184,8 +213,8 @@ const styles = {
     position: 'relative',
     zIndex: 50,
     borderBottom: 'none',
-    padding: '14px 24px',
-    boxShadow: '0 14px 32px -4px rgba(0, 0, 0, 0.55), 0 6px 14px rgba(0, 0, 0, 0.35)'
+    padding: '8px 24px',
+    boxShadow: '0 10px 25px -4px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(0, 0, 0, 0.3)'
   },
   navContainer: {
     maxWidth: '1180px',
@@ -194,23 +223,23 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: '16px'
+    gap: '12px'
   },
   brandGroup: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px'
+    gap: '10px'
   },
   logoIcon: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '10px',
-    backgroundColor: 'rgba(56, 189, 248, 0.15)',
-    border: '1.5px solid rgba(56, 189, 248, 0.35)',
+    width: '36px',
+    height: '36px',
+    borderRadius: '8px',
+    backgroundColor: 'rgba(56, 189, 248, 0.12)',
+    border: '1px solid rgba(56, 189, 248, 0.3)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)'
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
   },
   brandTitleRow: {
     display: 'flex',
@@ -218,16 +247,17 @@ const styles = {
     gap: '8px'
   },
   brandTitle: {
-    fontSize: '1.25rem',
+    fontSize: '1.15rem',
     fontWeight: '700',
     color: '#ffffff',
     margin: 0,
+    lineHeight: 1.2,
     letterSpacing: '-0.3px'
   },
   brandSubtitle: {
-    fontSize: '0.75rem',
+    fontSize: '0.7rem',
     color: '#7dd3fc',
-    margin: '2px 0 0 0'
+    margin: '1px 0 0 0'
   },
   navActions: {
     display: 'flex',
@@ -316,7 +346,7 @@ const styles = {
   },
   subBar: {
     width: '100%',
-    padding: '18px 20px 0 20px',
+    padding: '12px 20px 0 20px',
   },
   subBarContainer: {
     maxWidth: '1180px',
