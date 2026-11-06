@@ -104,7 +104,7 @@ export default function Home() {
               height="17"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#0b3b68"
+              stroke="#0284c7"
               strokeWidth="2.2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -175,15 +175,17 @@ export default function Home() {
 const styles = {
   pageWrapper: {
     minHeight: '100vh',
-    backgroundColor: '#f8fafc',
+    background: 'linear-gradient(180deg, #1964a7 0%, #124d85 30%, #0d3b68 65%, #082d54 100%)',
     display: 'flex',
     flexDirection: 'column'
   },
   navbar: {
-    backgroundColor: '#0b3b68', 
-    borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+    backgroundColor: '#072b4f', 
+    position: 'relative',
+    zIndex: 50,
+    borderBottom: 'none',
     padding: '14px 24px',
-    boxShadow: '0 2px 10px rgba(11, 59, 104, 0.25)'
+    boxShadow: '0 14px 32px -4px rgba(0, 0, 0, 0.55), 0 6px 14px rgba(0, 0, 0, 0.35)'
   },
   navContainer: {
     maxWidth: '1180px',
@@ -203,12 +205,12 @@ const styles = {
     width: '40px',
     height: '40px',
     borderRadius: '10px',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    border: '1px solid rgba(255, 255, 255, 0.25)',
+    backgroundColor: 'rgba(56, 189, 248, 0.15)',
+    border: '1.5px solid rgba(56, 189, 248, 0.35)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)'
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)'
   },
   brandTitleRow: {
     display: 'flex',
@@ -224,7 +226,7 @@ const styles = {
   },
   brandSubtitle: {
     fontSize: '0.75rem',
-    color: '#bae6fd',
+    color: '#7dd3fc',
     margin: '2px 0 0 0'
   },
   navActions: {
@@ -244,7 +246,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    border: '1px solid rgba(255, 255, 255, 0.25)',
+    border: '1px solid rgba(56, 189, 248, 0.35)',
     width: '36px',
     height: '36px',
     borderRadius: '50%',
@@ -278,13 +280,13 @@ const styles = {
     left: '50%',
     transform: 'translateX(-50%)',
     backgroundColor: '#072b4f',
-    border: '1px solid rgba(186, 230, 253, 0.35)',
+    border: '1px solid rgba(56, 189, 248, 0.45)',
     borderRadius: '8px',
     padding: '7px 12px',
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
     zIndex: 999,
     whiteSpace: 'nowrap',
     pointerEvents: 'none'
@@ -327,24 +329,23 @@ const styles = {
     alignItems: 'center',
     gap: '8px',
     padding: '10px 18px',
-    backgroundColor: '#ffffff',
-    background: 'radial-gradient(ellipse at center, #ffffff 65%, #f0f9ff 100%)',
-    border: '1.5px solid #bfdbfe',
+    background: 'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #bae6fd 0%, #38bdf8 50%, #0284c7 100%) border-box',
+    border: '2px solid transparent',
     borderRadius: '10px',
-    color: '#0b3b68',
+    color: '#072b4f',
     fontSize: '0.85rem',
     fontWeight: '700',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
-    boxShadow: '0 2px 8px -1px rgba(15, 23, 42, 0.05), inset 0 0 14px rgba(186, 230, 253, 0.45)',
+    boxShadow: '0 4px 15px rgba(56, 189, 248, 0.25), 0 2px 6px rgba(0, 0, 0, 0.08)',
   },
   mainContent: {
     flex: 1,
     padding: '14px 20px 28px 20px'
   },
   footer: {
-    backgroundColor: '#ffffff',
-    borderTop: '1px solid #bfdbfe',
+    backgroundColor: '#05223f',
+    borderTop: '1px solid rgba(56, 189, 248, 0.2)',
     padding: '16px 20px',
     marginTop: 'auto'
   },
@@ -355,7 +356,7 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     gap: '12px',
-    color: '#64748b',
+    color: '#93c5fd',
     fontSize: '0.775rem',
     flexWrap: 'wrap'
   },
@@ -366,18 +367,18 @@ const styles = {
   },
   footerLabel: {
     fontWeight: '500',
-    color: '#94a3b8'
+    color: '#7dd3fc'
   },
   footerCode: {
-    backgroundColor: '#f0f9ff',
-    border: '1px solid #bae6fd',
-    color: '#0369a1',
-    padding: '2px 6px',
+    backgroundColor: 'rgba(5, 26, 50, 0.8)',
+    border: '1px solid rgba(56, 189, 248, 0.35)',
+    color: '#38bdf8',
+    padding: '2px 8px',
     borderRadius: '4px',
     fontFamily: 'monospace',
     fontSize: '0.75rem'
   },
   footerDivider: {
-    color: '#cbd5e1'
+    color: 'rgba(56, 189, 248, 0.4)'
   }
 }
