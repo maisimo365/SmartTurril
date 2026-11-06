@@ -36,29 +36,35 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
   const litrosTotales = Math.round((nivelClamped / 100) * capacidadLitros);
   const litrosUtiles = Math.round((porcentajeUtil / 100) * (alturaUtilTotal / distanciaVacio) * capacidadLitros);
 
-  // Estados y colores profesionales acordes a la paleta azul zafiro / cian
+  // Estados y colores profesionales con insignias nítidas de alto contraste
   let estadoKey = 'normal';
   let estadoTexto = 'Nivel Normal';
   let colorPrimario = '#38bdf8'; // Celeste cian vibrante
-  let colorFondoBadge = 'rgba(56, 189, 248, 0.15)';
-  let colorTextoBadge = '#38bdf8';
+  let colorFondoBadge = '#ffffff';
+  let colorTextoBadge = '#16a34a'; // Verde nítido
+  let bordeBadge = '1.5px solid #86efac';
+  let shadowBadge = '0 4px 12px rgba(22, 163, 74, 0.2)';
   let colorGradienteAguaInicio = '#38bdf8';
   let colorGradienteAguaFin = '#0284c7';
 
   if (nivelClamped < criticoBajo) {
     estadoKey = 'critico';
     estadoTexto = 'Nivel Crítico';
-    colorPrimario = '#f87171'; // Rojo alarma
-    colorFondoBadge = 'rgba(239, 68, 68, 0.2)';
-    colorTextoBadge = '#fca5a5';
+    colorPrimario = '#ef4444'; // Rojo alarma
+    colorFondoBadge = '#ffffff';
+    colorTextoBadge = '#dc2626'; // Rojo nítido fuerte de alto contraste
+    bordeBadge = '1.5px solid #fca5a5';
+    shadowBadge = '0 4px 14px rgba(220, 38, 38, 0.3)';
     colorGradienteAguaInicio = '#f87171';
     colorGradienteAguaFin = '#dc2626';
   } else if (nivelClamped > criticoAlto) {
     estadoKey = 'alerta';
     estadoTexto = 'Riesgo de Desborde';
-    colorPrimario = '#fbbf24'; // Ámbar advertencia
-    colorFondoBadge = 'rgba(245, 158, 11, 0.2)';
-    colorTextoBadge = '#fde047';
+    colorPrimario = '#f59e0b'; // Ámbar advertencia
+    colorFondoBadge = '#ffffff';
+    colorTextoBadge = '#d97706'; // Ámbar nítido fuerte
+    bordeBadge = '1.5px solid #fde68a';
+    shadowBadge = '0 4px 14px rgba(217, 119, 6, 0.25)';
     colorGradienteAguaInicio = '#fbbf24';
     colorGradienteAguaFin = '#d97706';
   }
@@ -135,7 +141,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
             <span style={styles.cardSubtitle}>Visualización en tiempo real</span>
             <h2 style={styles.cardTitle}>Tanque de Almacenamiento</h2>
           </div>
-          <div style={{ ...styles.badgeEstado, backgroundColor: colorFondoBadge, color: colorTextoBadge }}>
+          <div style={{ ...styles.badgeEstado, backgroundColor: colorFondoBadge, color: colorTextoBadge, border: bordeBadge, boxShadow: shadowBadge }}>
             {estadoKey === 'normal' && (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12" />
@@ -744,15 +750,15 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
             <svg viewBox="0 0 500 120" preserveAspectRatio="none" style={styles.svgGrafico}>
               <defs>
                 <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={colorPrimario} stopOpacity="0.3" />
-                  <stop offset="100%" stopColor={colorPrimario} stopOpacity="0.0" />
+                  <stop offset="0%" stopColor={colorPrimario} stopOpacity="0.25" />
+                  <stop offset="100%" stopColor={colorPrimario} stopOpacity="0.02" />
                 </linearGradient>
               </defs>
 
               {/* Líneas horizontales de guía */}
-              <line x1="0" y1="20" x2="500" y2="20" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="0" y1="100" x2="500" y2="100" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="0" y1="20" x2="500" y2="20" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="0" y1="60" x2="500" y2="60" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="0" y1="100" x2="500" y2="100" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3 3" />
 
               {/* Guía de Alerta Crítica (Línea roja discontinua a 20%) */}
               <line
@@ -894,22 +900,23 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '6px',
-    padding: '6px 12px',
+    padding: '6px 14px',
     borderRadius: '999px',
-    fontSize: '0.8rem',
-    fontWeight: '700',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+    fontSize: '0.82rem',
+    fontWeight: '800',
+    letterSpacing: '0.2px',
   },
   nivelHero: {
     width: '100%',
     display: 'flex',
     alignItems: 'center',
     gap: '14px',
-    background: 'linear-gradient(180deg, rgba(10, 45, 85, 0.78) 0%, rgba(6, 30, 60, 0.88) 100%)',
-    borderRadius: '12px',
-    border: 'none',
-    padding: '10px 16px',
-    marginBottom: '8px',
+    backgroundColor: '#ffffff',
+    borderRadius: '14px',
+    border: '1.5px solid rgba(255, 255, 255, 0.95)',
+    padding: '12px 18px',
+    marginBottom: '10px',
+    boxShadow: '0 8px 24px -2px rgba(8, 40, 80, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08)',
   },
   nivelHeroNumeroWrapper: {
     display: 'flex',
@@ -918,14 +925,14 @@ const styles = {
   nivelHeroNumero: {
     fontSize: '2.4rem',
     fontWeight: '800',
-    color: '#ffffff',
+    color: '#0f172a',
     lineHeight: 1,
     letterSpacing: '-1px',
   },
   nivelHeroPct: {
     fontSize: '1.3rem',
     fontWeight: '700',
-    color: '#38bdf8',
+    color: '#0284c7',
     marginLeft: '2px',
   },
   nivelHeroInfo: {
@@ -935,8 +942,8 @@ const styles = {
   },
   nivelHeroLabel: {
     fontSize: '0.8rem',
-    fontWeight: '700',
-    color: '#ffffff',
+    fontWeight: '800',
+    color: '#0f172a',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
   },
@@ -962,11 +969,12 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    background: 'linear-gradient(180deg, rgba(10, 45, 85, 0.78) 0%, rgba(6, 30, 60, 0.88) 100%)',
-    borderRadius: '12px',
-    border: 'none',
+    backgroundColor: '#ffffff',
+    borderRadius: '14px',
+    border: '1.5px solid rgba(255, 255, 255, 0.95)',
     padding: '12px 16px',
     marginTop: '16px',
+    boxShadow: '0 8px 24px -2px rgba(8, 40, 80, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08)',
   },
   resumenItem: {
     display: 'flex',
@@ -976,24 +984,24 @@ const styles = {
   },
   resumenLabel: {
     fontSize: '0.725rem',
-    color: '#bae6fd',
+    color: '#64748b',
     fontWeight: '600',
     marginBottom: '2px',
   },
   resumenValor: {
     fontSize: '1.05rem',
-    fontWeight: '700',
-    color: '#ffffff',
+    fontWeight: '800',
+    color: '#0f172a',
   },
   resumenUnidad: {
     fontSize: '0.75rem',
-    fontWeight: '500',
-    color: '#7dd3fc',
+    fontWeight: '600',
+    color: '#0284c7',
   },
   resumenDivisor: {
     width: '1px',
     height: '24px',
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    backgroundColor: '#e2e8f0',
   },
   metricasColumna: {
     display: 'flex',
@@ -1096,37 +1104,39 @@ const styles = {
   },
   controlesGrafico: {
     display: 'flex',
-    gap: '6px',
-    background: 'linear-gradient(180deg, rgba(10, 45, 85, 0.85) 0%, rgba(6, 30, 60, 0.92) 100%)',
+    gap: '4px',
+    backgroundColor: '#ffffff',
     padding: '3px',
-    borderRadius: '8px',
-    border: 'none',
+    borderRadius: '10px',
+    border: '1.5px solid rgba(255, 255, 255, 0.95)',
+    boxShadow: '0 4px 14px rgba(8, 40, 80, 0.16)',
   },
   btnFiltro: {
     padding: '4px 10px',
     borderRadius: '6px',
     border: 'none',
     backgroundColor: 'transparent',
-    color: '#bae6fd',
+    color: '#64748b',
     fontSize: '0.75rem',
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
   },
   btnFiltroActivo: {
-    backgroundColor: '#38bdf8',
-    color: '#072b4f',
+    backgroundColor: '#0284c7',
+    color: '#ffffff',
     fontWeight: '700',
-    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
+    boxShadow: '0 1px 3px rgba(2, 132, 199, 0.35)',
   },
   svgGraficoContainer: {
     width: '100%',
     height: '110px',
-    background: 'linear-gradient(180deg, rgba(10, 45, 85, 0.85) 0%, rgba(6, 30, 60, 0.92) 100%)',
-    borderRadius: '10px',
-    border: 'none',
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    border: '1.5px solid rgba(255, 255, 255, 0.95)',
     overflow: 'hidden',
-    padding: '4px',
+    padding: '6px',
+    boxShadow: '0 8px 24px -2px rgba(8, 40, 80, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08)',
   },
   svgGrafico: {
     width: '100%',
