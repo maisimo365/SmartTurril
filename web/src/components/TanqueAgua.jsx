@@ -599,7 +599,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
           <div style={styles.resumenDivisor} />
           <div style={styles.resumenItem}>
             <span style={styles.resumenLabel}>Volumen Útil</span>
-            <span style={{ ...styles.resumenValor, color: porcentajeUtil < 20 ? '#f87171' : '#38bdf8' }}>
+            <span style={{ ...styles.resumenValor, color: porcentajeUtil < 20 ? '#dc2626' : '#0284c7' }}>
               {litrosUtiles.toLocaleString()} <span style={styles.resumenUnidad}>L</span>
             </span>
           </div>
@@ -628,7 +628,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               </div>
             </div>
             <div style={styles.tarjetaValorWrapper}>
-              <span style={{ ...styles.tarjetaValor, color: colorPrimario }}>
+              <span style={{ ...styles.tarjetaValor, color: '#ffffff' }}>
                 {nivelClamped}
               </span>
               <span style={styles.tarjetaUnidad}>%</span>
@@ -651,7 +651,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               </div>
             </div>
             <div style={styles.tarjetaValorWrapper}>
-              <span style={{ ...styles.tarjetaValor, color: porcentajeUtil < 20 ? '#f87171' : '#34d399' }}>
+              <span style={{ ...styles.tarjetaValor, color: '#ffffff' }}>
                 {porcentajeUtil.toFixed(1)}
               </span>
               <span style={styles.tarjetaUnidad}>%</span>
@@ -755,19 +755,24 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
                 </linearGradient>
               </defs>
 
-              {/* Líneas horizontales de guía */}
-              <line x1="0" y1="20" x2="500" y2="20" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="0" y1="60" x2="500" y2="60" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="0" y1="100" x2="500" y2="100" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3 3" />
+              {/* Graduación numérica del eje Y y líneas guía visibles */}
+              <text x="32" y="24" textAnchor="end" fill="#64748b" fontSize="10" fontWeight="700">100%</text>
+              <line x1="38" y1="20" x2="500" y2="20" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3 3" />
+
+              <text x="32" y="64" textAnchor="end" fill="#64748b" fontSize="10" fontWeight="700">50%</text>
+              <line x1="38" y1="60" x2="500" y2="60" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3 3" />
+
+              <text x="32" y="104" textAnchor="end" fill="#64748b" fontSize="10" fontWeight="700">0%</text>
+              <line x1="38" y1="100" x2="500" y2="100" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3 3" />
 
               {/* Guía de Alerta Crítica (Línea roja discontinua a 20%) */}
               <line
-                x1="0"
-                y1={120 - (criticoBajo / 100) * 120}
+                x1="38"
+                y1={120 - (criticoBajo / 100) * 100 - 10}
                 x2="500"
-                y2={120 - (criticoBajo / 100) * 120}
+                y2={120 - (criticoBajo / 100) * 100 - 10}
                 stroke="#ef4444"
-                strokeWidth="1"
+                strokeWidth="1.2"
                 strokeDasharray="4 4"
               />
 
@@ -875,25 +880,31 @@ const styles = {
     width: '100%',
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '14px',
+    alignItems: 'flex-start',
+    gap: '12px',
+    marginBottom: '12px',
   },
   headerTitleGroup: {
     display: 'flex',
     flexDirection: 'column',
+    minWidth: 0,
+    flex: 1,
   },
   cardSubtitle: {
-    fontSize: '0.75rem',
-    fontWeight: '600',
+    fontSize: '0.72rem',
+    fontWeight: '700',
     color: '#f0f9ff',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
+    whiteSpace: 'nowrap',
   },
   cardTitle: {
-    fontSize: '1.2rem',
+    fontSize: '1.15rem',
     fontWeight: '800',
     color: '#ffffff',
-    margin: 0,
+    margin: '2px 0 0 0',
+    lineHeight: 1.2,
+    whiteSpace: 'nowrap',
     textShadow: '0 1px 2px rgba(10, 45, 80, 0.25)',
   },
   badgeEstado: {
@@ -983,25 +994,27 @@ const styles = {
     flex: 1,
   },
   resumenLabel: {
-    fontSize: '0.725rem',
+    fontSize: '0.72rem',
     color: '#64748b',
-    fontWeight: '600',
+    fontWeight: '700',
     marginBottom: '2px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.3px',
   },
   resumenValor: {
-    fontSize: '1.05rem',
+    fontSize: '1.15rem',
     fontWeight: '800',
-    color: '#0f172a',
+    color: '#072b4f',
   },
   resumenUnidad: {
-    fontSize: '0.75rem',
-    fontWeight: '600',
+    fontSize: '0.78rem',
+    fontWeight: '700',
     color: '#0284c7',
   },
   resumenDivisor: {
     width: '1px',
-    height: '24px',
-    backgroundColor: '#e2e8f0',
+    height: '26px',
+    backgroundColor: '#cbd5e1',
   },
   metricasColumna: {
     display: 'flex',
