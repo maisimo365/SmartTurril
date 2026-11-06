@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -68,39 +68,40 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
   const [filtroTiempo, setFiltroTiempo] = useState('real');
   const prevNivelRef = useRef(nivelClamped);
 
-  // Cargar datos históricos desde Supabase según el filtro seleccionado
-  const cargarHistorial = useCallback(async (filtro) => {
-    if (!supabase) return;
-    try {
-      let query = supabase.from('lecturas_tanque').select('nivel, created_at');
-
-      if (filtro === '1h') {
-        const unaHoraAtras = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-        query = query.gte('created_at', unaHoraAtras).order('created_at', { ascending: true }).limit(60);
-      } else if (filtro === '24h') {
-        const unDiaAtras = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-        query = query.gte('created_at', unDiaAtras).order('created_at', { ascending: true }).limit(100);
-      } else {
-        // 'real': Carga las últimas 25 lecturas registradas para que el gráfico no inicie vacío
-        query = query.order('created_at', { ascending: false }).limit(25);
-      }
-
-      const { data, error } = await query;
-      if (!error && data && data.length > 0) {
-        const puntos = filtro === 'real'
-          ? data.reverse().map(d => ({ nivel: d.nivel, timestamp: new Date(d.created_at) }))
-          : data.map(d => ({ nivel: d.nivel, timestamp: new Date(d.created_at) }));
-        setHistorial(puntos);
-      }
-    } catch (err) {
-      console.warn('Aviso: no se pudo consultar Supabase:', err);
-    }
-  }, []);
-
-  // Carga inicial y al presionar los filtros (Tiempo real, 1h, 24h)
+  // Carga inicial y al presionar los filtros (Tiempo real, 1h, 24h) desde Supabase
   useEffect(() => {
-    cargarHistorial(filtroTiempo);
-  }, [filtroTiempo, cargarHistorial]);
+    let cancelado = false;
+    async function obtenerHistorial() {
+      if (!supabase) return;
+      try {
+        let query = supabase.from('lecturas_tanque').select('nivel, created_at');
+
+        if (filtroTiempo === '1h') {
+          const unaHoraAtras = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+          query = query.gte('created_at', unaHoraAtras).order('created_at', { ascending: true }).limit(60);
+        } else if (filtroTiempo === '24h') {
+          const unDiaAtras = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+          query = query.gte('created_at', unDiaAtras).order('created_at', { ascending: true }).limit(100);
+        } else {
+          // 'real': Carga las últimas 25 lecturas registradas
+          query = query.order('created_at', { ascending: false }).limit(25);
+        }
+
+        const { data, error } = await query;
+        if (!cancelado && !error && data && data.length > 0) {
+          const puntos = filtroTiempo === 'real'
+            ? data.reverse().map(d => ({ nivel: d.nivel, timestamp: new Date(d.created_at) }))
+            : data.map(d => ({ nivel: d.nivel, timestamp: new Date(d.created_at) }));
+          setHistorial(puntos);
+        }
+      } catch (err) {
+        console.warn('Aviso: no se pudo consultar Supabase:', err);
+      }
+    }
+
+    obtenerHistorial();
+    return () => { cancelado = true; };
+  }, [filtroTiempo]);
 
   // En modo 'real', añade los nuevos datos que van llegando en vivo por MQTT
   useEffect(() => {
