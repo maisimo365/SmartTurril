@@ -42,7 +42,7 @@ export default function Home() {
           </div>
 
           <div style={styles.navActions}>
-            {/* Indicador de conexión LED con Tooltip Personalizado de interfaz */}
+            {/* Indicador de conexión LED con Tooltip Personalizado */}
             <div
               style={styles.statusWrapper}
               onMouseEnter={() => setMostrarTooltip(true)}
@@ -86,31 +86,36 @@ export default function Home() {
                 </div>
               )}
             </div>
-
-            {/* Botón de Calibración */}
-            <button
-              id="btn-calibrar"
-              onClick={() => setModalAbierto(true)}
-              style={styles.btnCalibrar}
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-              <span>Calibrar Tanque</span>
-            </button>
           </div>
         </div>
       </header>
+
+      {/* Barra de acción rápida para calibración fuera del encabezado */}
+      <div style={styles.subBar}>
+        <div style={styles.subBarContainer}>
+          <button
+            id="btn-calibrar"
+            onClick={() => setModalAbierto(true)}
+            style={styles.btnCalibrar}
+            className="smartturril-btn-calibrar"
+          >
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#0b3b68"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            <span>Calibrar Tanque</span>
+          </button>
+        </div>
+      </div>
 
       {/* Contenido Principal */}
       <main style={styles.mainContent}>
@@ -156,6 +161,12 @@ export default function Home() {
             grid-template-columns: 1fr !important;
           }
         }
+        @media (max-width: 600px) {
+          .smartturril-btn-calibrar {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
       `}</style>
     </div>
   )
@@ -169,7 +180,7 @@ const styles = {
     flexDirection: 'column'
   },
   navbar: {
-    backgroundColor: '#0b3b68', // Azul similar a la referencia
+    backgroundColor: '#0b3b68', 
     borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
     padding: '14px 24px',
     boxShadow: '0 2px 10px rgba(11, 59, 104, 0.25)'
@@ -301,24 +312,35 @@ const styles = {
     color: '#ffffff',
     letterSpacing: '0.2px'
   },
+  subBar: {
+    width: '100%',
+    padding: '18px 20px 0 20px',
+  },
+  subBarContainer: {
+    maxWidth: '1180px',
+    margin: '0 auto',
+    display: 'flex',
+    justifyContent: 'flex-start',
+  },
   btnCalibrar: {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '8px',
-    padding: '8px 16px',
+    padding: '10px 18px',
     backgroundColor: '#ffffff',
-    border: 'none',
-    borderRadius: '8px',
+    background: 'radial-gradient(ellipse at center, #ffffff 65%, #f0f9ff 100%)',
+    border: '1.5px solid #bfdbfe',
+    borderRadius: '10px',
     color: '#0b3b68',
-    fontSize: '0.825rem',
+    fontSize: '0.85rem',
     fontWeight: '700',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)'
+    boxShadow: '0 2px 8px -1px rgba(15, 23, 42, 0.05), inset 0 0 14px rgba(186, 230, 253, 0.45)',
   },
   mainContent: {
     flex: 1,
-    padding: '28px 20px'
+    padding: '14px 20px 28px 20px'
   },
   footer: {
     backgroundColor: '#ffffff',
