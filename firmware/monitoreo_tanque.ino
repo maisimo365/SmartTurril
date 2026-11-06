@@ -11,8 +11,8 @@ const int ECHO_PIN = 18;
 //    DISTANCIA_VACIO_CM : distancia (cm) al fondo cuando el tanque está completamente vacío.
 //    DISTANCIA_LLENO_CM : distancia (cm) al agua en el punto de llenado máximo permitido.
 //                         DEBE ser >= 3–5 cm para respetar el punto ciego del HC-SR04.
-const float DISTANCIA_VACIO_CM = 100.0; // ← Ajustar: fondo del prototipo (cm)
-const float DISTANCIA_LLENO_CM = 5.0;  // ← Ajustar: nivel máximo permitido (mín. 3–5 cm desde el sensor)
+const float DISTANCIA_VACIO_CM = 33.0; // ← Fondo real del prototipo vacío (cm)
+const float DISTANCIA_LLENO_CM = 5.0;   // ← Nivel máximo permitido (mín. 3–5 cm desde el sensor)
 
 // ============================================================
 // 3. Credenciales de Red y Broker MQTT (AWS)

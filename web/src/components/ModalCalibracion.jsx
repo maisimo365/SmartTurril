@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const CLAVE_STORAGE = 'smartturril_calibracion';
 const MARGEN_LLENO_CM = 5; // Margen de seguridad superior (punto ciego HC-SR04)
@@ -15,14 +15,17 @@ export function leerCalibracion() {
 }
 
 export default function ModalCalibracion({ abierto, distanciaActual, onCerrar, onGuardar }) {
-  const [calibracionActual, setCalibracionActual] = useState(null);
+  const [calibracionActual, setCalibracionActual] = useState(leerCalibracion);
   const [ok, setOk] = useState(false);
+  const [prevAbierto, setPrevAbierto] = useState(abierto);
 
-  useEffect(() => {
-    if (!abierto) return;
-    setOk(false);
-    setCalibracionActual(leerCalibracion());
-  }, [abierto]);
+  if (abierto !== prevAbierto) {
+    setPrevAbierto(abierto);
+    if (abierto) {
+      setOk(false);
+      setCalibracionActual(leerCalibracion());
+    }
+  }
 
   function autocalibrarFondo() {
     if (!distanciaActual || distanciaActual <= MARGEN_LLENO_CM) return;
