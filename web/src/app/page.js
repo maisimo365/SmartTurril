@@ -8,13 +8,14 @@ export default function Home() {
   const { nivel, distanciaCm, status } = useMQTT()
   const [modalAbierto, setModalAbierto] = useState(false)
   const [calibracion, setCalibracion] = useState(leerCalibracion)
+  const [mostrarTooltip, setMostrarTooltip] = useState(false)
 
   const isConnected = status === 'Conectado'
   const isReconnecting = status === 'Reconectando'
 
   return (
     <div style={styles.pageWrapper}>
-      {/* Barra de navegación superior limpia y profesional */}
+      {/* Barra de navegación superior en azul profesional */}
       <header style={styles.navbar}>
         <div style={styles.navContainer}>
           <div style={styles.brandGroup}>
@@ -35,38 +36,55 @@ export default function Home() {
             <div>
               <div style={styles.brandTitleRow}>
                 <h1 style={styles.brandTitle}>SmartTurril</h1>
-                <span style={styles.brandBadge}>v1.0</span>
               </div>
               <p style={styles.brandSubtitle}>Monitoreo Telemático de Nivel de Agua</p>
             </div>
           </div>
 
           <div style={styles.navActions}>
-            {/* Estado del Broker MQTT con indicador de pulso luminoso */}
-            <div style={styles.statusPill}>
-              <span style={styles.pulseContainer}>
-                <span
-                  style={{
-                    ...styles.pulseDot,
-                    backgroundColor: isConnected
-                      ? '#10b981'
-                      : isReconnecting
-                        ? '#f59e0b'
-                        : '#ef4444'
-                  }}
-                />
-                {isConnected && <span style={styles.pulseRing} />}
-              </span>
-              <span style={styles.statusText}>
-                MQTT:{' '}
-                <strong
-                  style={{
-                    color: isConnected ? '#059669' : isReconnecting ? '#d97706' : '#dc2626'
-                  }}
-                >
-                  {status}
-                </strong>
-              </span>
+            {/* Indicador de conexión LED con Tooltip Personalizado de interfaz */}
+            <div
+              style={styles.statusWrapper}
+              onMouseEnter={() => setMostrarTooltip(true)}
+              onMouseLeave={() => setMostrarTooltip(false)}
+            >
+              <div style={styles.statusIndicator}>
+                <span style={styles.pulseContainer}>
+                  <span
+                    style={{
+                      ...styles.pulseDot,
+                      backgroundColor: isConnected
+                        ? '#00e676'
+                        : isReconnecting
+                          ? '#f59e0b'
+                          : '#ef4444',
+                      boxShadow: isConnected
+                        ? '0 0 10px #00e676'
+                        : isReconnecting
+                          ? '0 0 10px #f59e0b'
+                          : '0 0 10px #ef4444'
+                    }}
+                  />
+                  {isConnected && <span style={styles.pulseRing} />}
+                </span>
+              </div>
+
+              {/* Tooltip estilizado */}
+              {mostrarTooltip && (
+                <div style={styles.tooltipCard}>
+                  <div style={styles.tooltipArrow} />
+                  <span
+                    style={{
+                      ...styles.tooltipLed,
+                      backgroundColor: isConnected ? '#00e676' : isReconnecting ? '#f59e0b' : '#ef4444',
+                      boxShadow: isConnected ? '0 0 6px #00e676' : 'none'
+                    }}
+                  />
+                  <span style={styles.tooltipTexto}>
+                    {isConnected ? 'MQTT: Conectado' : isReconnecting ? 'Reconectando...' : 'MQTT: Desconectado'}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Botón de Calibración */}
@@ -151,10 +169,10 @@ const styles = {
     flexDirection: 'column'
   },
   navbar: {
-    backgroundColor: '#ffffff',
-    borderBottom: '1px solid #e2e8f0',
-    padding: '16px 24px',
-    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.03)'
+    backgroundColor: '#0b3b68', // Azul similar a la referencia
+    borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+    padding: '14px 24px',
+    boxShadow: '0 2px 10px rgba(11, 59, 104, 0.25)'
   },
   navContainer: {
     maxWidth: '1180px',
@@ -174,11 +192,12 @@ const styles = {
     width: '40px',
     height: '40px',
     borderRadius: '10px',
-    backgroundColor: '#0284c7',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    border: '1px solid rgba(255, 255, 255, 0.25)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 4px 10px rgba(2, 132, 199, 0.25)'
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)'
   },
   brandTitleRow: {
     display: 'flex',
@@ -188,64 +207,99 @@ const styles = {
   brandTitle: {
     fontSize: '1.25rem',
     fontWeight: '700',
-    color: '#0f172a',
+    color: '#ffffff',
     margin: 0,
     letterSpacing: '-0.3px'
   },
-  brandBadge: {
-    fontSize: '0.65rem',
-    fontWeight: '700',
-    backgroundColor: '#e0f2fe',
-    color: '#0369a1',
-    padding: '2px 6px',
-    borderRadius: '4px',
-    textTransform: 'uppercase'
-  },
   brandSubtitle: {
     fontSize: '0.75rem',
-    color: '#64748b',
+    color: '#bae6fd',
     margin: '2px 0 0 0'
   },
   navActions: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: '14px',
     flexWrap: 'wrap'
   },
-  statusPill: {
+  statusWrapper: {
+    position: 'relative',
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    backgroundColor: '#f8fafc',
-    border: '1px solid #e2e8f0',
-    padding: '6px 14px',
-    borderRadius: '999px',
-    fontSize: '0.8rem'
+    justifyContent: 'center'
+  },
+  statusIndicator: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    border: '1px solid rgba(255, 255, 255, 0.25)',
+    width: '36px',
+    height: '36px',
+    borderRadius: '50%',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s ease'
   },
   pulseContainer: {
     position: 'relative',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '10px',
-    height: '10px'
+    width: '12px',
+    height: '12px'
   },
   pulseDot: {
-    width: '8px',
-    height: '8px',
+    width: '10px',
+    height: '10px',
     borderRadius: '50%'
   },
   pulseRing: {
     position: 'absolute',
-    width: '14px',
-    height: '14px',
+    width: '18px',
+    height: '18px',
     borderRadius: '50%',
-    backgroundColor: '#10b981',
+    backgroundColor: '#00e676',
     animation: 'pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite'
   },
-  statusText: {
-    color: '#475569',
-    fontWeight: '500'
+  tooltipCard: {
+    position: 'absolute',
+    top: 'calc(100% + 10px)',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    backgroundColor: '#072b4f',
+    border: '1px solid rgba(186, 230, 253, 0.35)',
+    borderRadius: '8px',
+    padding: '7px 12px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+    zIndex: 999,
+    whiteSpace: 'nowrap',
+    pointerEvents: 'none'
+  },
+  tooltipArrow: {
+    position: 'absolute',
+    top: '-5px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 0,
+    height: 0,
+    borderLeft: '5px solid transparent',
+    borderRight: '5px solid transparent',
+    borderBottom: '5px solid #072b4f'
+  },
+  tooltipLed: {
+    width: '7px',
+    height: '7px',
+    borderRadius: '50%',
+    display: 'inline-block'
+  },
+  tooltipTexto: {
+    fontSize: '0.78rem',
+    fontWeight: '600',
+    color: '#ffffff',
+    letterSpacing: '0.2px'
   },
   btnCalibrar: {
     display: 'inline-flex',
@@ -253,14 +307,14 @@ const styles = {
     gap: '8px',
     padding: '8px 16px',
     backgroundColor: '#ffffff',
-    border: '1px solid #cbd5e1',
+    border: 'none',
     borderRadius: '8px',
-    color: '#334155',
+    color: '#0b3b68',
     fontSize: '0.825rem',
-    fontWeight: '600',
+    fontWeight: '700',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
-    boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)'
   },
   mainContent: {
     flex: 1,
@@ -268,7 +322,7 @@ const styles = {
   },
   footer: {
     backgroundColor: '#ffffff',
-    borderTop: '1px solid #e2e8f0',
+    borderTop: '1px solid #bfdbfe',
     padding: '16px 20px',
     marginTop: 'auto'
   },
@@ -293,8 +347,9 @@ const styles = {
     color: '#94a3b8'
   },
   footerCode: {
-    backgroundColor: '#f1f5f9',
-    color: '#0f172a',
+    backgroundColor: '#f0f9ff',
+    border: '1px solid #bae6fd',
+    color: '#0369a1',
     padding: '2px 6px',
     borderRadius: '4px',
     fontFamily: 'monospace',

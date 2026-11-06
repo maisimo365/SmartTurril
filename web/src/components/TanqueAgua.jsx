@@ -1,5 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
 import { CONFIG_TANQUE, UMBRALES_ALERTA } from '@/config/tanque';
 
 export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion }) {
@@ -58,16 +63,55 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
     colorGradienteAguaFin = '#d97706';
   }
 
-  // Historial de profundidad
+  // Historial de profundidad conectado a Supabase
   const [historial, setHistorial] = useState([]);
   const [filtroTiempo, setFiltroTiempo] = useState('real');
-  const [prevNivel, setPrevNivel] = useState(nivelClamped);
+  const prevNivelRef = useRef(nivelClamped);
 
-  if (nivelClamped !== prevNivel) {
-    setPrevNivel(nivelClamped);
-    const nuevo = [...historial, { nivel: nivelClamped, timestamp: new Date() }];
-    setHistorial(nuevo.length > 25 ? nuevo.slice(-25) : nuevo);
-  }
+  // Cargar datos históricos desde Supabase según el filtro seleccionado
+  const cargarHistorial = useCallback(async (filtro) => {
+    if (!supabase) return;
+    try {
+      let query = supabase.from('lecturas_tanque').select('nivel, created_at');
+
+      if (filtro === '1h') {
+        const unaHoraAtras = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        query = query.gte('created_at', unaHoraAtras).order('created_at', { ascending: true }).limit(60);
+      } else if (filtro === '24h') {
+        const unDiaAtras = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        query = query.gte('created_at', unDiaAtras).order('created_at', { ascending: true }).limit(100);
+      } else {
+        // 'real': Carga las últimas 25 lecturas registradas para que el gráfico no inicie vacío
+        query = query.order('created_at', { ascending: false }).limit(25);
+      }
+
+      const { data, error } = await query;
+      if (!error && data && data.length > 0) {
+        const puntos = filtro === 'real'
+          ? data.reverse().map(d => ({ nivel: d.nivel, timestamp: new Date(d.created_at) }))
+          : data.map(d => ({ nivel: d.nivel, timestamp: new Date(d.created_at) }));
+        setHistorial(puntos);
+      }
+    } catch (err) {
+      console.warn('Aviso: no se pudo consultar Supabase:', err);
+    }
+  }, []);
+
+  // Carga inicial y al presionar los filtros (Tiempo real, 1h, 24h)
+  useEffect(() => {
+    cargarHistorial(filtroTiempo);
+  }, [filtroTiempo, cargarHistorial]);
+
+  // En modo 'real', añade los nuevos datos que van llegando en vivo por MQTT
+  useEffect(() => {
+    if (filtroTiempo === 'real' && nivelClamped !== prevNivelRef.current) {
+      prevNivelRef.current = nivelClamped;
+      setHistorial(prev => {
+        const nuevo = [...prev, { nivel: nivelClamped, timestamp: new Date() }];
+        return nuevo.length > 25 ? nuevo.slice(-25) : nuevo;
+      });
+    }
+  }, [nivelClamped, filtroTiempo]);
 
   // Dimensiones del visor dentro del tanque SVG
   // El cuerpo cilíndrico del tanque va desde Y=125 hasta Y=395 (altura = 270px)
@@ -773,9 +817,10 @@ const styles = {
   },
   tanqueCard: {
     backgroundColor: '#ffffff',
+    background: 'radial-gradient(ellipse at center, #ffffff 65%, #f0f9ff 100%)',
     borderRadius: '16px',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.05)',
+    border: '1.5px solid #bfdbfe',
+    boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.05), inset 0 0 24px rgba(186, 230, 253, 0.45)',
     padding: '24px',
     display: 'flex',
     flexDirection: 'column',
@@ -834,7 +879,7 @@ const styles = {
     alignItems: 'center',
     backgroundColor: '#f8fafc',
     borderRadius: '12px',
-    border: '1px solid #e2e8f0',
+    border: '1px solid #bae6fd',
     padding: '12px 16px',
     marginTop: '16px',
   },
@@ -877,10 +922,11 @@ const styles = {
   },
   tarjetaMetrica: {
     backgroundColor: '#ffffff',
+    background: 'radial-gradient(ellipse at center, #ffffff 60%, #f0f9ff 100%)',
     borderRadius: '14px',
-    border: '1px solid #e2e8f0',
+    border: '1.5px solid #bfdbfe',
     padding: '18px',
-    boxShadow: '0 2px 8px -1px rgba(15, 23, 42, 0.04)',
+    boxShadow: '0 2px 8px -1px rgba(15, 23, 42, 0.04), inset 0 0 18px rgba(186, 230, 253, 0.45)',
     display: 'flex',
     flexDirection: 'column',
   },
@@ -939,10 +985,11 @@ const styles = {
   },
   graficoCard: {
     backgroundColor: '#ffffff',
+    background: 'radial-gradient(ellipse at center, #ffffff 65%, #f0f9ff 100%)',
     borderRadius: '16px',
-    border: '1px solid #e2e8f0',
+    border: '1.5px solid #bfdbfe',
     padding: '20px',
-    boxShadow: '0 2px 10px -2px rgba(15, 23, 42, 0.04)',
+    boxShadow: '0 2px 10px -2px rgba(15, 23, 42, 0.04), inset 0 0 24px rgba(186, 230, 253, 0.45)',
   },
   graficoHeader: {
     display: 'flex',
@@ -1021,8 +1068,10 @@ const styles = {
     gridTemplateColumns: 'repeat(4, 1fr)',
     gap: '10px',
     backgroundColor: '#ffffff',
+    background: 'radial-gradient(ellipse at center, #ffffff 60%, #f0f9ff 100%)',
     borderRadius: '12px',
-    border: '1px solid #e2e8f0',
+    border: '1.5px solid #bfdbfe',
+    boxShadow: 'inset 0 0 16px rgba(186, 230, 253, 0.4)',
     padding: '14px 16px',
   },
   fichaItem: {
