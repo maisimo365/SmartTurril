@@ -6,9 +6,11 @@
 const int TRIG_PIN = 5;
 const int ECHO_PIN = 18;
 
-// Pines para los LEDs indicadores (usar los pines 22 y 23)
-const int LED_ROJO_PIN  = 23; // LED Rojo: <= 20% o >= 80%
-const int LED_VERDE_PIN = 22; // LED Verde: 21% a 79%
+// Pines para los 4 LEDs indicadores (Semáforo de nivel)
+const int LED_ROJO_PIN     = 23; // LED Rojo: 0% a 20% (Crítico Bajo)
+const int LED_AMARILLO_PIN = 19; // LED Amarillo: 21% a 45% (Advertencia / Nivel Bajo)
+const int LED_VERDE_PIN    = 22; // LED Verde: 46% a 80% (Nivel Óptimo / Normal)
+const int LED_AZUL_PIN     = 21; // LED Azul: 81% a 100% (Tanque Lleno / Máximo)
 
 // 2. Calibración del Tanque — HU-06
 //    Medir con regla desde el sensor hasta la base interior del contenedor.
@@ -118,16 +120,26 @@ int calcularNivel(float distancia) {
   return (int)round(porcentaje);
 }
 
-// Función para controlar los LEDs según el nivel de agua
+// Función para controlar los 4 LEDs según el nivel de agua (Propuesta 1: Semáforo de 4 Estados)
 void actualizarLeds(int nivel) {
-  // LED Rojo: <= 20% (crítico bajo) o >= 80% (crítico alto / desborde)
-  // LED Verde: 21% a 79% (rango normal y seguro)
-  if (nivel <= 20 || nivel >= 80) {
+  // Apagar todos primero para garantizar que solo uno esté encendido
+  digitalWrite(LED_ROJO_PIN, LOW);
+  digitalWrite(LED_AMARILLO_PIN, LOW);
+  digitalWrite(LED_VERDE_PIN, LOW);
+  digitalWrite(LED_AZUL_PIN, LOW);
+
+  if (nivel <= 20) {
+    // 0% a 20%: Crítico Bajo / Vacío (Rojo)
     digitalWrite(LED_ROJO_PIN, HIGH);
-    digitalWrite(LED_VERDE_PIN, LOW);
-  } else {
-    digitalWrite(LED_ROJO_PIN, LOW);
+  } else if (nivel <= 45) {
+    // 21% a 45%: Nivel Bajo / Advertencia (Amarillo)
+    digitalWrite(LED_AMARILLO_PIN, HIGH);
+  } else if (nivel <= 80) {
+    // 46% a 80%: Nivel Óptimo / Normal (Verde)
     digitalWrite(LED_VERDE_PIN, HIGH);
+  } else {
+    // 81% a 100%: Tanque Lleno / Máximo (Azul)
+    digitalWrite(LED_AZUL_PIN, HIGH);
   }
 }
 
@@ -147,11 +159,15 @@ void setup() {
   pinMode(ECHO_PIN, INPUT);
   digitalWrite(TRIG_PIN, LOW);
 
-  // Configuración de pines de los LEDs
+  // Configuración de pines de los 4 LEDs
   pinMode(LED_ROJO_PIN, OUTPUT);
+  pinMode(LED_AMARILLO_PIN, OUTPUT);
   pinMode(LED_VERDE_PIN, OUTPUT);
+  pinMode(LED_AZUL_PIN, OUTPUT);
   digitalWrite(LED_ROJO_PIN, LOW);
+  digitalWrite(LED_AMARILLO_PIN, LOW);
   digitalWrite(LED_VERDE_PIN, LOW);
+  digitalWrite(LED_AZUL_PIN, LOW);
 
   setupWiFi();
 
