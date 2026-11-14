@@ -2,8 +2,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #082d54;
-  --foreground: #ffffff;
+  --background: #cfe3f2;
+  --foreground: #234a78;
   --font-roboto: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
 }
 
