@@ -10,6 +10,16 @@ const brokerUrl = process.env.MQTT_BROKER_URL;
 const topic = process.env.MQTT_TOPIC || 'smartturril/tanque01/nivel';
 const umbralCritico = parseFloat(process.env.UMBRAL_CRITICO) || 80;
 
+// Configuración de Telegram
+const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
+const telegramChatId = process.env.TELEGRAM_CHAT_ID;
+
+if (telegramToken && telegramChatId) {
+  console.log('✓ Telegram configurado correctamente');
+} else {
+  console.warn('⚠️ Credenciales de Telegram no configuradas en .env. No se enviarán alertas por Telegram.');
+}
+
 // Configuración de Supabase
 const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -91,9 +101,12 @@ client.on('message', async (recvTopic, message) => {
         const restante = Math.ceil((COOLDOWN_MS - tiempoDesdeUltimaAlerta) / 1000);
         console.log(`Nivel crítico (${nivelActual}%) pero en cooldown. Próxima alerta en ${restante}s`);
       } else {
-        console.log(`ALERTA: Nivel ${nivelActual}% >= ${umbralCritico}%. Enviando correo...`);
+        console.log(`ALERTA: Nivel ${nivelActual}% >= ${umbralCritico}%. Enviando notificaciones...`);
         ultimaAlertaTs = ahora;
-        await enviarCorreoAlerta(nivelActual, distancia);
+        await Promise.allSettled([
+          enviarCorreoAlerta(nivelActual, distancia),
+          enviarTelegramAlerta(nivelActual, distancia),
+        ]);
       }
     } else {
       console.log(`   Nivel normal ✓`);
@@ -146,9 +159,44 @@ async function enviarCorreoAlerta(nivel, distancia) {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('Correo enviado. ID:', info.messageId);
+    console.log(' Correo enviado. ID:', info.messageId);
   } catch (err) {
-    console.error('Error enviando correo:', err.message);
+    console.error('❌ Error enviando correo:', err.message);
+  }
+}
+
+async function enviarTelegramAlerta(nivel, distancia) {
+  if (!telegramToken || !telegramChatId) {
+    return;
+  }
+
+  const mensaje = `🚨 *Alerta de Nivel de Tanque - SmartTurril*\n\n` +
+    `📍 *Tanque:* smartturril/tanque01\n` +
+    `💧 *Nivel actual:* ${nivel}%\n` +
+    `📏 *Distancia medida:* ${distancia} cm\n` +
+    `⚠️ *Umbral configurado:* ${umbralCritico}%\n\n` +
+    `Por favor revise el llenado para evitar rebalses.`;
+
+  try {
+    const url = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: telegramChatId,
+        text: mensaje,
+        parse_mode: 'Markdown',
+      }),
+    });
+
+    const data = await response.json();
+    if (data.ok) {
+      console.log('📱 Alerta enviada por Telegram exitosamente.');
+    } else {
+      console.error('❌ Error enviando a Telegram:', data.description);
+    }
+  } catch (err) {
+    console.error('❌ Excepción al enviar a Telegram:', err.message);
   }
 }
 

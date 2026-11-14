@@ -40,10 +40,10 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
   let estadoKey = 'normal';
   let estadoTexto = 'Nivel Normal';
   let colorPrimario = '#38bdf8'; // Celeste cian vibrante
-  let colorFondoBadge = '#ffffff';
-  let colorTextoBadge = '#16a34a'; // Verde nítido
-  let bordeBadge = '1.5px solid #86efac';
-  let shadowBadge = '0 4px 12px rgba(22, 163, 74, 0.2)';
+  let colorFondoBadge = '#249447';
+  let colorTextoBadge = '#ffffff';
+  let bordeBadge = '1.5px solid #1d7d3b';
+  let shadowBadge = '0 3px 9px rgba(22, 120, 55, 0.24)';
   let colorGradienteAguaInicio = '#38bdf8';
   let colorGradienteAguaFin = '#0284c7';
 
@@ -51,20 +51,20 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
     estadoKey = 'critico';
     estadoTexto = 'Nivel Crítico';
     colorPrimario = '#ef4444'; // Rojo alarma
-    colorFondoBadge = '#ffffff';
-    colorTextoBadge = '#dc2626'; // Rojo nítido fuerte de alto contraste
-    bordeBadge = '1.5px solid #fca5a5';
-    shadowBadge = '0 4px 14px rgba(220, 38, 38, 0.3)';
+    colorFondoBadge = '#d9363e';
+    colorTextoBadge = '#ffffff';
+    bordeBadge = '1.5px solid #bd2932';
+    shadowBadge = '0 3px 10px rgba(185, 35, 44, 0.28)';
     colorGradienteAguaInicio = '#f87171';
     colorGradienteAguaFin = '#dc2626';
   } else if (nivelClamped > criticoAlto) {
     estadoKey = 'alerta';
     estadoTexto = 'Riesgo de Desborde';
     colorPrimario = '#f59e0b'; // Ámbar advertencia
-    colorFondoBadge = '#ffffff';
-    colorTextoBadge = '#d97706'; // Ámbar nítido fuerte
-    bordeBadge = '1.5px solid #fde68a';
-    shadowBadge = '0 4px 14px rgba(217, 119, 6, 0.25)';
+    colorFondoBadge = '#d88a16';
+    colorTextoBadge = '#ffffff';
+    bordeBadge = '1.5px solid #b8730f';
+    shadowBadge = '0 3px 10px rgba(166, 103, 13, 0.25)';
     colorGradienteAguaInicio = '#fbbf24';
     colorGradienteAguaFin = '#d97706';
   }
@@ -135,8 +135,8 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
   return (
     <div style={styles.dashboardContainer} className="smartturril-dashboard-container">
       {/* Columna Izquierda: Representación realista del Tanque Industrial */}
-      <div style={styles.tanqueCard}>
-        <div style={styles.cardHeader}>
+      <div style={styles.tanqueCard} className="smartturril-tank-card">
+        <div style={styles.cardHeader} className="smartturril-card-header">
           <div style={styles.headerTitleGroup}>
             <span style={styles.cardSubtitle}>Visualización en tiempo real</span>
             <h2 style={styles.cardTitle}>Tanque de Almacenamiento</h2>
@@ -184,6 +184,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
           <svg
             viewBox="-50 0 440 440"
             style={styles.tanqueSvg}
+            className="smartturril-tank-svg"
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
@@ -535,21 +536,23 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
                     y1={tickY}
                     x2="50"
                     y2={tickY}
-                    stroke="#ffffff"
-                    strokeWidth="2.5"
+                    stroke="#0284c7"
+                    strokeWidth="2"
                     strokeLinecap="round"
-                    strokeOpacity="0.9"
+                    strokeOpacity="0.95"
                   />
                   {/* Número de porcentaje grande en el exterior */}
                   <text
                     x="24"
                     y={tickY + 5.5}
                     textAnchor="end"
-                    fill="#ffffff"
+                    fill="#087db8"
                     fontSize="15"
                     fontWeight="800"
                     fontFamily="Roboto, sans-serif"
-                    style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.6))' }}
+                    stroke="#ffffff"
+                    strokeWidth="1.5"
+                    paintOrder="stroke"
                   >
                     {pct}%
                   </text>
@@ -628,7 +631,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               </div>
             </div>
             <div style={styles.tarjetaValorWrapper}>
-              <span style={{ ...styles.tarjetaValor, color: '#ffffff' }}>
+              <span style={styles.tarjetaValor}>
                 {nivelClamped}
               </span>
               <span style={styles.tarjetaUnidad}>%</span>
@@ -651,7 +654,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               </div>
             </div>
             <div style={styles.tarjetaValorWrapper}>
-              <span style={{ ...styles.tarjetaValor, color: '#ffffff' }}>
+              <span style={styles.tarjetaValor}>
                 {porcentajeUtil.toFixed(1)}
               </span>
               <span style={styles.tarjetaUnidad}>%</span>
@@ -666,7 +669,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
           <div style={styles.tarjetaMetrica}>
             <div style={styles.tarjetaHeader}>
               <span style={styles.tarjetaEtiqueta}>Distancia al Agua</span>
-              <div style={{ ...styles.tarjetaIcono, backgroundColor: 'rgba(168, 85, 247, 0.15)', color: '#c084fc' }}>
+              <div style={{ ...styles.tarjetaIcono, backgroundColor: 'rgba(56, 189, 248, 0.15)', color: '#0ea5e9' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <polyline points="12 6 12 12 16 14" />
@@ -674,7 +677,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               </div>
             </div>
             <div style={styles.tarjetaValorWrapper}>
-              <span style={{ ...styles.tarjetaValor, color: '#ffffff' }}>
+              <span style={styles.tarjetaValor}>
                 {distanciaActual.toFixed(1)}
               </span>
               <span style={styles.tarjetaUnidad}>cm</span>
@@ -683,7 +686,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               <div style={{
                 ...styles.tarjetaBarraProgreso,
                 width: `${Math.min(100, (distanciaActual / distanciaVacio) * 100)}%`,
-                backgroundColor: '#a855f7'
+                backgroundColor: '#0ea5e9'
               }} />
             </div>
             <span style={styles.tarjetaSubinfo}>Sensor a superficie libre</span>
@@ -701,7 +704,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               </div>
             </div>
             <div style={styles.tarjetaValorWrapper}>
-              <span style={{ ...styles.tarjetaValor, color: '#ffffff' }}>
+              <span style={styles.tarjetaValor}>
                 {alturaAguaDesdeBase.toFixed(1)}
               </span>
               <span style={styles.tarjetaUnidad}>cm</span>
@@ -719,12 +722,12 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
 
         {/* Gráfico de Historial y Tendencia */}
         <div style={styles.graficoCard}>
-          <div style={styles.graficoHeader}>
+          <div style={styles.graficoHeader} className="smartturril-chart-header">
             <div>
               <h3 style={styles.graficoTitulo}>Tendencia de Nivel</h3>
               <p style={styles.graficoSubtitulo}>Monitoreo continuo en vivo</p>
             </div>
-            <div style={styles.controlesGrafico}>
+            <div style={styles.controlesGrafico} className="smartturril-chart-controls">
               <button
                 style={{ ...styles.btnFiltro, ...(filtroTiempo === 'real' ? styles.btnFiltroActivo : {}) }}
                 onClick={() => setFiltroTiempo('real')}
@@ -800,7 +803,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
             </svg>
           </div>
 
-          <div style={styles.graficoFooter}>
+          <div style={styles.graficoFooter} className="smartturril-chart-footer">
             <div style={styles.leyendaItem}>
               <span style={{ ...styles.leyendaDot, backgroundColor: colorPrimario }} />
               <span>Nivel actual: <strong>{nivelClamped}%</strong></span>
@@ -841,14 +844,56 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
         @media (max-width: 900px) {
           .smartturril-dashboard-container {
             grid-template-columns: 1fr !important;
+            gap: 18px !important;
           }
         }
         @media (max-width: 600px) {
+          .smartturril-tank-card {
+            padding: 16px !important;
+          }
+          .smartturril-card-header {
+            flex-wrap: wrap;
+            align-items: center !important;
+            gap: 8px !important;
+          }
+          .smartturril-card-header > div:first-child {
+            flex-basis: 100%;
+          }
+          .smartturril-card-header h2 {
+            white-space: normal !important;
+            font-size: 1.05rem !important;
+          }
+          .smartturril-tank-svg {
+            max-height: 82vw !important;
+          }
           .smartturril-grid-tarjetas {
             grid-template-columns: 1fr !important;
+            gap: 12px !important;
           }
           .smartturril-ficha-tecnica {
             grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px 8px !important;
+          }
+          .smartturril-chart-header {
+            flex-wrap: wrap;
+            gap: 12px;
+          }
+          .smartturril-chart-controls {
+            max-width: 100%;
+          }
+          .smartturril-chart-footer {
+            gap: 8px 12px !important;
+          }
+        }
+        @media (max-width: 380px) {
+          .smartturril-card-header h2 {
+            font-size: 0.98rem !important;
+          }
+          .smartturril-tank-card {
+            padding: 12px !important;
+          }
+          .smartturril-ficha-tecnica {
+            font-size: 0.9rem;
           }
         }
       `}</style>
@@ -866,11 +911,10 @@ const styles = {
     alignItems: 'start',
   },
   tanqueCard: {
-    background: 'linear-gradient(150deg, #62aade 0%, #4697d6 50%, #2b7bc0 100%)',
+    background: 'radial-gradient(ellipse at center, #ffffff 38%, #e1f1fc 100%)',
     borderRadius: '16px',
-    border: 'none',
-    boxShadow: '0 8px 30px rgba(15, 60, 110, 0.22)',
-    backdropFilter: 'blur(8px)',
+    border: '1.5px solid #75add6',
+    boxShadow: '0 10px 28px rgba(35, 83, 124, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.85) inset',
     padding: '24px',
     display: 'flex',
     flexDirection: 'column',
@@ -893,7 +937,7 @@ const styles = {
   cardSubtitle: {
     fontSize: '0.72rem',
     fontWeight: '700',
-    color: '#f0f9ff',
+    color: '#7297bd',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
     whiteSpace: 'nowrap',
@@ -901,11 +945,10 @@ const styles = {
   cardTitle: {
     fontSize: '1.15rem',
     fontWeight: '800',
-    color: '#ffffff',
+    color: '#285c96',
     margin: '2px 0 0 0',
     lineHeight: 1.2,
     whiteSpace: 'nowrap',
-    textShadow: '0 1px 2px rgba(10, 45, 80, 0.25)',
   },
   badgeEstado: {
     display: 'inline-flex',
@@ -922,12 +965,12 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '14px',
-    backgroundColor: '#ffffff',
+    background: 'radial-gradient(ellipse at center, #f8fbff 0%, #e7f1f9 62%, #c7d9e8 100%)',
     borderRadius: '14px',
-    border: '1.5px solid rgba(255, 255, 255, 0.95)',
+    border: '1.5px solid #a9c5dc',
     padding: '12px 18px',
     marginBottom: '10px',
-    boxShadow: '0 8px 24px -2px rgba(8, 40, 80, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08)',
+    boxShadow: '0 5px 16px rgba(53, 86, 117, 0.14)',
   },
   nivelHeroNumeroWrapper: {
     display: 'flex',
@@ -936,14 +979,14 @@ const styles = {
   nivelHeroNumero: {
     fontSize: '2.4rem',
     fontWeight: '800',
-    color: '#0f172a',
+    color: '#285584',
     lineHeight: 1,
     letterSpacing: '-1px',
   },
   nivelHeroPct: {
     fontSize: '1.3rem',
     fontWeight: '700',
-    color: '#0284c7',
+    color: '#287db2',
     marginLeft: '2px',
   },
   nivelHeroInfo: {
@@ -954,7 +997,7 @@ const styles = {
   nivelHeroLabel: {
     fontSize: '0.8rem',
     fontWeight: '800',
-    color: '#0f172a',
+    color: '#315b84',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
   },
@@ -968,6 +1011,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     padding: '6px 0',
+    background: 'radial-gradient(ellipse at 50% 55%, rgba(255, 197, 74, 0.32) 0%, rgba(255, 215, 120, 0.18) 42%, rgba(255, 226, 155, 0) 72%)',
   },
   tanqueSvg: {
     width: '100%',
@@ -980,12 +1024,12 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    background: 'radial-gradient(ellipse at center, #ffffff 42%, #e3f2fc 100%)',
     borderRadius: '14px',
-    border: '1.5px solid rgba(255, 255, 255, 0.95)',
+    border: '1.5px solid #b5d9f2',
     padding: '12px 16px',
     marginTop: '16px',
-    boxShadow: '0 8px 24px -2px rgba(8, 40, 80, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08)',
+    boxShadow: '0 5px 16px rgba(45, 105, 156, 0.12)',
   },
   resumenItem: {
     display: 'flex',
@@ -1004,7 +1048,7 @@ const styles = {
   resumenValor: {
     fontSize: '1.15rem',
     fontWeight: '800',
-    color: '#072b4f',
+    color: '#285584',
   },
   resumenUnidad: {
     fontSize: '0.78rem',
@@ -1027,12 +1071,11 @@ const styles = {
     gap: '16px',
   },
   tarjetaMetrica: {
-    background: 'linear-gradient(150deg, #62aade 0%, #4697d6 50%, #2b7bc0 100%)',
+    background: 'radial-gradient(ellipse at center, #ffffff 42%, #e1f1fc 100%)',
     borderRadius: '14px',
-    border: 'none',
+    border: '1.5px solid #83b7dc',
     padding: '18px',
-    boxShadow: '0 8px 25px rgba(15, 60, 110, 0.2)',
-    backdropFilter: 'blur(8px)',
+    boxShadow: '0 7px 20px rgba(35, 83, 124, 0.2)',
     display: 'flex',
     flexDirection: 'column',
   },
@@ -1045,7 +1088,7 @@ const styles = {
   tarjetaEtiqueta: {
     fontSize: '0.85rem',
     fontWeight: '700',
-    color: '#ffffff',
+    color: '#285584',
   },
   tarjetaIcono: {
     width: '32px',
@@ -1065,17 +1108,17 @@ const styles = {
     fontSize: '1.85rem',
     fontWeight: '800',
     lineHeight: 1,
-    color: '#ffffff',
+    color: '#2460a3',
   },
   tarjetaUnidad: {
     fontSize: '0.9rem',
     fontWeight: '600',
-    color: '#e0f2fe',
+    color: '#3973aa',
   },
   tarjetaBarraFondo: {
     width: '100%',
     height: '6px',
-    backgroundColor: 'rgba(255, 255, 255, 0.28)',
+    backgroundColor: '#d2e5f5',
     borderRadius: '999px',
     overflow: 'hidden',
     marginBottom: '6px',
@@ -1087,16 +1130,15 @@ const styles = {
   },
   tarjetaSubinfo: {
     fontSize: '0.725rem',
-    color: '#f0f9ff',
+    color: '#55799d',
     fontWeight: '500',
   },
   graficoCard: {
-    background: 'linear-gradient(150deg, #62aade 0%, #4697d6 50%, #2b7bc0 100%)',
+    background: 'radial-gradient(ellipse at center, #ffffff 42%, #e1f1fc 100%)',
     borderRadius: '16px',
-    border: 'none',
+    border: '1.5px solid #83b7dc',
     padding: '20px',
-    boxShadow: '0 8px 25px rgba(15, 60, 110, 0.2)',
-    backdropFilter: 'blur(8px)',
+    boxShadow: '0 7px 20px rgba(35, 83, 124, 0.19)',
   },
   graficoHeader: {
     display: 'flex',
@@ -1107,12 +1149,12 @@ const styles = {
   graficoTitulo: {
     fontSize: '1rem',
     fontWeight: '800',
-    color: '#ffffff',
+    color: '#285584',
     margin: 0,
   },
   graficoSubtitulo: {
     fontSize: '0.75rem',
-    color: '#f0f9ff',
+    color: '#55799d',
     margin: '2px 0 0 0',
   },
   controlesGrafico: {
@@ -1121,8 +1163,8 @@ const styles = {
     backgroundColor: '#ffffff',
     padding: '3px',
     borderRadius: '10px',
-    border: '1.5px solid rgba(255, 255, 255, 0.95)',
-    boxShadow: '0 4px 14px rgba(8, 40, 80, 0.16)',
+    border: '1.5px solid #b5d9f2',
+    boxShadow: '0 3px 10px rgba(45, 105, 156, 0.12)',
   },
   btnFiltro: {
     padding: '4px 10px',
@@ -1136,20 +1178,20 @@ const styles = {
     transition: 'all 0.15s ease',
   },
   btnFiltroActivo: {
-    backgroundColor: '#0284c7',
+    backgroundColor: '#1ca9e5',
     color: '#ffffff',
     fontWeight: '700',
-    boxShadow: '0 1px 3px rgba(2, 132, 199, 0.35)',
+    boxShadow: '0 2px 6px rgba(2, 132, 199, 0.25)',
   },
   svgGraficoContainer: {
     width: '100%',
     height: '110px',
     backgroundColor: '#ffffff',
     borderRadius: '12px',
-    border: '1.5px solid rgba(255, 255, 255, 0.95)',
+    border: '1.5px solid #b5d9f2',
     overflow: 'hidden',
     padding: '6px',
-    boxShadow: '0 8px 24px -2px rgba(8, 40, 80, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08)',
+    boxShadow: '0 5px 16px rgba(45, 105, 156, 0.12)',
   },
   svgGrafico: {
     width: '100%',
@@ -1166,7 +1208,7 @@ const styles = {
     alignItems: 'center',
     gap: '6px',
     fontSize: '0.75rem',
-    color: '#ffffff',
+    color: '#466b91',
   },
   leyendaDot: {
     width: '8px',
@@ -1177,11 +1219,10 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 1fr)',
     gap: '10px',
-    background: 'linear-gradient(150deg, #62aade 0%, #4697d6 50%, #2b7bc0 100%)',
+    background: 'radial-gradient(ellipse at center, #ffffff 42%, #e1f1fc 100%)',
     borderRadius: '12px',
-    border: 'none',
-    boxShadow: '0 8px 25px rgba(15, 60, 110, 0.2)',
-    backdropFilter: 'blur(8px)',
+    border: '1.5px solid #83b7dc',
+    boxShadow: '0 6px 18px rgba(35, 83, 124, 0.18)',
     padding: '14px 16px',
   },
   fichaItem: {
@@ -1191,13 +1232,13 @@ const styles = {
   },
   fichaLabel: {
     fontSize: '0.7rem',
-    color: '#f0f9ff',
+    color: '#7195b8',
     fontWeight: '600',
     textTransform: 'uppercase',
   },
   fichaValor: {
     fontSize: '0.85rem',
     fontWeight: '700',
-    color: '#ffffff',
+    color: '#315b84',
   },
 };

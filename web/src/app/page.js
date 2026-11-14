@@ -16,8 +16,8 @@ export default function Home() {
   return (
     <div style={styles.pageWrapper}>
       {/* Barra de navegación superior en azul profesional */}
-      <header style={styles.navbar}>
-        <div style={styles.navContainer}>
+      <header style={styles.navbar} className="smartturril-navbar">
+        <div style={styles.navContainer} className="smartturril-nav-container">
           <div style={styles.brandGroup}>
             <div style={styles.logoIcon}>
               <svg
@@ -82,16 +82,16 @@ export default function Home() {
                   <span
                     style={{
                       ...styles.pulseDot,
-                      backgroundColor: isConnected
-                        ? '#00e676'
+                      background: isConnected
+                        ? 'radial-gradient(circle at 35% 30%, #dcfce7 0%, #4ade80 32%, #22c55e 68%, #15803d 100%)'
                         : isReconnecting
-                          ? '#f59e0b'
-                          : '#ef4444',
+                          ? 'radial-gradient(circle at 35% 30%, #fef3c7 0%, #fbbf24 38%, #d97706 100%)'
+                          : 'radial-gradient(circle at 35% 30%, #fee2e2 0%, #f87171 38%, #b91c1c 100%)',
                       boxShadow: isConnected
-                        ? '0 0 10px #00e676'
+                        ? 'inset 0 1px 2px rgba(255,255,255,0.85), 0 0 8px rgba(34,197,94,0.65)'
                         : isReconnecting
-                          ? '0 0 10px #f59e0b'
-                          : '0 0 10px #ef4444'
+                          ? 'inset 0 1px 2px rgba(255,255,255,0.75), 0 0 8px rgba(245,158,11,0.55)'
+                          : 'inset 0 1px 2px rgba(255,255,255,0.7), 0 0 8px rgba(239,68,68,0.5)'
                     }}
                   />
                   {isConnected && <span style={styles.pulseRing} />}
@@ -105,8 +105,12 @@ export default function Home() {
                   <span
                     style={{
                       ...styles.tooltipLed,
-                      backgroundColor: isConnected ? '#00e676' : isReconnecting ? '#f59e0b' : '#ef4444',
-                      boxShadow: isConnected ? '0 0 6px #00e676' : 'none'
+                      background: isConnected
+                        ? 'radial-gradient(circle at 35% 30%, #dcfce7 0%, #4ade80 32%, #22c55e 68%, #15803d 100%)'
+                        : isReconnecting
+                          ? 'radial-gradient(circle at 35% 30%, #fef3c7 0%, #fbbf24 38%, #d97706 100%)'
+                          : 'radial-gradient(circle at 35% 30%, #fee2e2 0%, #f87171 38%, #b91c1c 100%)',
+                      boxShadow: isConnected ? '0 0 6px rgba(34,197,94,0.55)' : 'none'
                     }}
                   />
                   <span style={styles.tooltipTexto}>
@@ -120,7 +124,7 @@ export default function Home() {
       </header>
 
       {/* Barra de acción rápida para calibración fuera del encabezado */}
-      <div style={styles.subBar}>
+      <div style={styles.subBar} className="smartturril-subbar">
         <div style={styles.subBarContainer}>
           <button
             id="btn-calibrar"
@@ -133,7 +137,7 @@ export default function Home() {
               height="17"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#0284c7"
+              stroke="#ffffff"
               strokeWidth="2.2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -147,7 +151,7 @@ export default function Home() {
       </div>
 
       {/* Contenido Principal */}
-      <main style={styles.mainContent}>
+      <main style={styles.mainContent} className="smartturril-main">
         <TanqueAgua nivel={nivel} distanciaCm={distanciaCm} calibracion={calibracion} />
       </main>
 
@@ -195,6 +199,18 @@ export default function Home() {
             width: 100% !important;
             justify-content: center !important;
           }
+          .smartturril-navbar {
+            padding: 8px 14px !important;
+          }
+          .smartturril-nav-container {
+            gap: 8px !important;
+          }
+          .smartturril-subbar {
+            padding: 10px 12px 0 !important;
+          }
+          .smartturril-main {
+            padding: 12px 12px 20px !important;
+          }
         }
       `}</style>
     </div>
@@ -204,17 +220,17 @@ export default function Home() {
 const styles = {
   pageWrapper: {
     minHeight: '100vh',
-    background: 'linear-gradient(180deg, #1964a7 0%, #124d85 30%, #0d3b68 65%, #082d54 100%)',
+    background: 'linear-gradient(180deg, #dcecf8 0%, #cfe3f2 55%, #c4dced 100%)',
     display: 'flex',
     flexDirection: 'column'
   },
   navbar: {
-    backgroundColor: '#072b4f', 
+    background: 'linear-gradient(100deg, #37aee5 0%, #54bde9 100%)',
     position: 'relative',
     zIndex: 50,
-    borderBottom: 'none',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.4)',
     padding: '8px 24px',
-    boxShadow: '0 10px 25px -4px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(0, 0, 0, 0.3)'
+    boxShadow: '0 8px 18px rgba(28, 76, 115, 0.3)'
   },
   navContainer: {
     maxWidth: '1180px',
@@ -234,12 +250,12 @@ const styles = {
     width: '36px',
     height: '36px',
     borderRadius: '8px',
-    backgroundColor: 'rgba(56, 189, 248, 0.12)',
-    border: '1px solid rgba(56, 189, 248, 0.3)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    border: '1px solid rgba(255, 255, 255, 0.32)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+    boxShadow: '0 2px 8px rgba(25, 99, 155, 0.12)'
   },
   brandTitleRow: {
     display: 'flex',
@@ -256,7 +272,7 @@ const styles = {
   },
   brandSubtitle: {
     fontSize: '0.7rem',
-    color: '#7dd3fc',
+    color: '#effaff',
     margin: '1px 0 0 0'
   },
   navActions: {
@@ -275,8 +291,8 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    border: '1px solid rgba(56, 189, 248, 0.35)',
+    backgroundColor: 'rgba(255, 255, 255, 0.28)',
+    border: '1px solid rgba(255, 255, 255, 0.45)',
     width: '36px',
     height: '36px',
     borderRadius: '50%',
@@ -301,7 +317,7 @@ const styles = {
     width: '18px',
     height: '18px',
     borderRadius: '50%',
-    backgroundColor: '#00e676',
+    backgroundColor: 'rgba(34, 197, 94, 0.3)',
     animation: 'pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite'
   },
   tooltipCard: {
@@ -309,14 +325,14 @@ const styles = {
     top: 'calc(100% + 10px)',
     left: '50%',
     transform: 'translateX(-50%)',
-    backgroundColor: '#072b4f',
-    border: '1px solid rgba(56, 189, 248, 0.45)',
+    backgroundColor: '#ffffff',
+    border: '1px solid #c8e7fb',
     borderRadius: '8px',
     padding: '7px 12px',
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+    boxShadow: '0 8px 24px rgba(32, 91, 145, 0.18)',
     zIndex: 999,
     whiteSpace: 'nowrap',
     pointerEvents: 'none'
@@ -330,7 +346,7 @@ const styles = {
     height: 0,
     borderLeft: '5px solid transparent',
     borderRight: '5px solid transparent',
-    borderBottom: '5px solid #072b4f'
+    borderBottom: '5px solid #ffffff'
   },
   tooltipLed: {
     width: '7px',
@@ -341,7 +357,7 @@ const styles = {
   tooltipTexto: {
     fontSize: '0.78rem',
     fontWeight: '600',
-    color: '#ffffff',
+    color: '#234a78',
     letterSpacing: '0.2px'
   },
   subBar: {
@@ -359,23 +375,23 @@ const styles = {
     alignItems: 'center',
     gap: '8px',
     padding: '10px 18px',
-    background: 'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #bae6fd 0%, #38bdf8 50%, #0284c7 100%) border-box',
-    border: '2px solid transparent',
+    background: 'linear-gradient(135deg, #26a9e0 0%, #0879c5 100%)',
+    border: '1px solid #0879c5',
     borderRadius: '10px',
-    color: '#072b4f',
+    color: '#ffffff',
     fontSize: '0.85rem',
     fontWeight: '700',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
-    boxShadow: '0 4px 15px rgba(56, 189, 248, 0.25), 0 2px 6px rgba(0, 0, 0, 0.08)',
+    boxShadow: '0 4px 12px rgba(8, 121, 197, 0.28)',
   },
   mainContent: {
     flex: 1,
     padding: '14px 20px 28px 20px'
   },
   footer: {
-    backgroundColor: '#05223f',
-    borderTop: '1px solid rgba(56, 189, 248, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.62)',
+    borderTop: '1px solid #cfe7f8',
     padding: '16px 20px',
     marginTop: 'auto'
   },
@@ -386,7 +402,7 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     gap: '12px',
-    color: '#93c5fd',
+    color: '#56789a',
     fontSize: '0.775rem',
     flexWrap: 'wrap'
   },
@@ -397,18 +413,18 @@ const styles = {
   },
   footerLabel: {
     fontWeight: '500',
-    color: '#7dd3fc'
+    color: '#3977ad'
   },
   footerCode: {
-    backgroundColor: 'rgba(5, 26, 50, 0.8)',
-    border: '1px solid rgba(56, 189, 248, 0.35)',
-    color: '#38bdf8',
+    backgroundColor: '#eef8ff',
+    border: '1px solid #c8e7fb',
+    color: '#167db8',
     padding: '2px 8px',
     borderRadius: '4px',
     fontFamily: 'monospace',
     fontSize: '0.75rem'
   },
   footerDivider: {
-    color: 'rgba(56, 189, 248, 0.4)'
+    color: '#91b5d3'
   }
 }

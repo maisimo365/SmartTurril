@@ -142,7 +142,7 @@ export default function ModalCalibracion({ abierto, distanciaActual, onCerrar, o
 const s = {
   overlay: { position: 'fixed', inset: 0, backgroundColor: 'rgba(3, 14, 27, 0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(6px)', padding: '1rem', fontFamily: 'inherit' },
   modal: {
-    background: 'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #bae6fd 0%, #38bdf8 50%, #0284c7 100%) border-box',
+    background: 'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #9bcbed 0%, #38bdf8 50%, #0284c7 100%) border-box',
     borderRadius: '16px',
     boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3), 0 0 20px rgba(56, 189, 248, 0.25)',
     width: '100%',
@@ -161,7 +161,7 @@ const s = {
   hint: { margin: 0, fontSize: '0.875rem', color: '#475569', lineHeight: '1.5' },
   panelLectura: {
     background: 'linear-gradient(180deg, #f8fafc 0%, #f0f9ff 100%)',
-    border: '1.5px solid #bae6fd',
+    border: '1.5px solid #9bcbed',
     borderRadius: '12px',
     padding: '16px',
     display: 'flex',
