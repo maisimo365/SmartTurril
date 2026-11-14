@@ -18,6 +18,12 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Shared tank calibration
+
+Calibration is stored in Supabase so all devices use the same empty/full distances. To set up the shared table, run [`supabase/migrations/20261114100000_shared_tank_calibration.sql`](./supabase/migrations/20261114100000_shared_tank_calibration.sql) in the Supabase SQL Editor. The dashboard loads the shared value on startup, publishes updates to connected devices in real time, and imports an existing browser calibration if the shared value has not been created yet.
+
+This dashboard currently uses the Supabase anonymous key without user sign-in. The migration therefore grants anonymous clients permission to read and update the single `tanque01` calibration row. Anyone with access to the dashboard can change that calibration; enable authentication and tighten the table policies if that is not acceptable for your deployment.
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More

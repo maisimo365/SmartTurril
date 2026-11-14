@@ -1,17 +1,101 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import useMQTT from '@/hooks/useMQTT'
 import TanqueAgua from '@/components/TanqueAgua'
 import ModalCalibracion, { leerCalibracion } from '@/components/ModalCalibracion'
+import { guardarCalibracionLocal, inicializarCalibracionCompartida, normalizarFilaCalibracion, CALIBRACION_ID, guardarCalibracionCompartida } from '@/lib/calibracion'
+import { supabase } from '@/lib/supabase'
 
 export default function Home() {
   const { nivel, distanciaCm, status } = useMQTT()
   const [modalAbierto, setModalAbierto] = useState(false)
   const [calibracion, setCalibracion] = useState(leerCalibracion)
+  const [errorSincronizacion, setErrorSincronizacion] = useState(
+    supabase ? '' : 'Supabase no está configurado; los cambios no se pueden compartir entre dispositivos.',
+  )
   const [mostrarTooltip, setMostrarTooltip] = useState(false)
 
   const isConnected = status === 'Conectado'
   const isReconnecting = status === 'Reconectando'
+
+  useEffect(() => {
+    if (!supabase) {
+      return undefined
+    }
+
+    let cancelado = false
+    let ultimaActualizacion = 0
+    const aplicarFilaCompartida = (row) => {
+      try {
+        const nuevaCalibracion = normalizarFilaCalibracion(row)
+        if (!nuevaCalibracion) return
+        const actualizadaEn = Date.parse(row.updated_at) || Date.now()
+        if (actualizadaEn < ultimaActualizacion) return
+        ultimaActualizacion = actualizadaEn
+        setCalibracion(nuevaCalibracion)
+        guardarCalibracionLocal(nuevaCalibracion)
+        setErrorSincronizacion('')
+      } catch (error) {
+        console.error('La calibración sincronizada no es válida:', error)
+        setErrorSincronizacion(error.message || 'La calibración compartida contiene valores inválidos.')
+      }
+    }
+
+    const canal = supabase
+      .channel(`calibracion-${CALIBRACION_ID}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'configuracion_tanque', filter: `id=eq.${CALIBRACION_ID}` },
+        (payload) => {
+          if (payload.eventType === 'DELETE') {
+            setCalibracion(null)
+            return
+          }
+          aplicarFilaCompartida(payload.new)
+        },
+      )
+      .subscribe((estado, error) => {
+        if (cancelado) return
+        if (estado === 'CHANNEL_ERROR' || estado === 'TIMED_OUT') {
+          console.error('No se pudo mantener la sincronización en tiempo real:', error)
+          setErrorSincronizacion('No se pudo mantener la sincronización en tiempo real. Recarga la página para actualizar la calibración.')
+        }
+      })
+
+    async function sincronizarCalibracion() {
+      try {
+        const resultado = await inicializarCalibracionCompartida()
+        if (cancelado) return
+        if (resultado) {
+          aplicarFilaCompartida({
+            distancia_vacio: resultado.calibracion.distanciaVacio,
+            distancia_lleno: resultado.calibracion.distanciaLleno,
+            updated_at: resultado.updatedAt,
+          })
+        } else {
+          setCalibracion(null)
+          setErrorSincronizacion('')
+        }
+      } catch (error) {
+        console.error('No se pudo cargar la calibración compartida:', error)
+        if (!cancelado) {
+          setErrorSincronizacion(error.message || 'No se pudo cargar la calibración compartida.')
+        }
+      }
+    }
+
+    sincronizarCalibracion()
+    return () => {
+      cancelado = true
+      supabase.removeChannel(canal)
+    }
+  }, [])
+
+  async function guardarCalibracion(nueva) {
+    const resultado = await guardarCalibracionCompartida(nueva)
+    setCalibracion(resultado.calibracion)
+    setErrorSincronizacion('')
+  }
 
   return (
     <div style={styles.pageWrapper}>
@@ -152,6 +236,11 @@ export default function Home() {
 
       {/* Contenido Principal */}
       <main style={styles.mainContent} className="smartturril-main">
+        {errorSincronizacion && (
+          <p role="alert" style={styles.errorSincronizacion}>
+            No se pudo sincronizar la calibración: {errorSincronizacion}
+          </p>
+        )}
         <TanqueAgua nivel={nivel} distanciaCm={distanciaCm} calibracion={calibracion} />
       </main>
 
@@ -179,8 +268,9 @@ export default function Home() {
       <ModalCalibracion
         abierto={modalAbierto}
         distanciaActual={distanciaCm}
+        calibracion={calibracion}
         onCerrar={() => setModalAbierto(false)}
-        onGuardar={(nueva) => setCalibracion(nueva)}
+        onGuardar={guardarCalibracion}
       />
 
       <style>{`
@@ -388,6 +478,16 @@ const styles = {
   mainContent: {
     flex: 1,
     padding: '14px 20px 28px 20px'
+  },
+  errorSincronizacion: {
+    maxWidth: '1180px',
+    margin: '0 auto 12px',
+    padding: '10px 14px',
+    color: '#8f1d24',
+    backgroundColor: '#fff1f2',
+    border: '1px solid #f5b8bc',
+    borderRadius: '8px',
+    fontSize: '0.85rem',
   },
   footer: {
     backgroundColor: 'rgba(255, 255, 255, 0.62)',
