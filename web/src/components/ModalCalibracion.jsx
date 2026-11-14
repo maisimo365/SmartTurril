@@ -1,33 +1,29 @@
 'use client';
 import { useState } from 'react';
-
-const CLAVE_STORAGE = 'smartturril_calibracion';
+import { leerCalibracionLocal } from '@/lib/calibracion';
 const MARGEN_LLENO_CM = 5; // Margen de seguridad superior (punto ciego HC-SR04)
 
 export function leerCalibracion() {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = localStorage.getItem(CLAVE_STORAGE);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
+  return leerCalibracionLocal();
 }
 
-export default function ModalCalibracion({ abierto, distanciaActual, onCerrar, onGuardar }) {
+export default function ModalCalibracion({ abierto, distanciaActual, calibracion, onCerrar, onGuardar }) {
   const [calibracionActual, setCalibracionActual] = useState(leerCalibracion);
   const [ok, setOk] = useState(false);
+  const [guardando, setGuardando] = useState(false);
+  const [errorGuardar, setErrorGuardar] = useState('');
   const [prevAbierto, setPrevAbierto] = useState(abierto);
 
   if (abierto !== prevAbierto) {
     setPrevAbierto(abierto);
     if (abierto) {
       setOk(false);
-      setCalibracionActual(leerCalibracion());
+      setErrorGuardar('');
+      setCalibracionActual(calibracion ?? leerCalibracion());
     }
   }
 
-  function autocalibrarFondo() {
+  async function autocalibrarFondo() {
     if (!distanciaActual || distanciaActual <= MARGEN_LLENO_CM) return;
 
     const nueva = {
@@ -35,14 +31,21 @@ export default function ModalCalibracion({ abierto, distanciaActual, onCerrar, o
       distanciaLleno: MARGEN_LLENO_CM,
     };
 
-    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(nueva));
-    setCalibracionActual(nueva);
-    setOk(true);
+    setGuardando(true);
+    setErrorGuardar('');
+    try {
+      await onGuardar(nueva);
+      setCalibracionActual(nueva);
+      setOk(true);
 
-    setTimeout(() => {
-      onGuardar(nueva);
-      onCerrar();
-    }, 700);
+      setTimeout(onCerrar, 700);
+    } catch (error) {
+      console.error('No se pudo sincronizar la calibración:', error);
+      const mensaje = error instanceof Error ? error.message : 'Comprueba la conexión e inténtalo de nuevo.';
+      setErrorGuardar(`No se pudo sincronizar la calibración. ${mensaje}`);
+    } finally {
+      setGuardando(false);
+    }
   }
 
   if (!abierto) return null;
@@ -110,17 +113,18 @@ export default function ModalCalibracion({ abierto, distanciaActual, onCerrar, o
             <span>Lleno seguro: <strong>{calibracionActual.distanciaLleno} cm</strong></span>
           </div>
         )}
+        {errorGuardar && <p role="alert" style={s.errorGuardar}>{errorGuardar}</p>}
 
         <div style={s.footer}>
           <button style={s.btnCancelar} onClick={onCerrar}>Cancelar</button>
           <button
             style={{
               ...s.btnCapturar,
-              ...(!distanciaActual ? s.btnDisabled : {}),
+              ...(!distanciaActual || guardando ? s.btnDisabled : {}),
               ...(ok ? s.btnOk : {})
             }}
             onClick={autocalibrarFondo}
-            disabled={!distanciaActual || ok}
+            disabled={!distanciaActual || ok || guardando}
           >
             {ok ? (
               <span style={s.btnContent}>
@@ -129,9 +133,7 @@ export default function ModalCalibracion({ abierto, distanciaActual, onCerrar, o
                 </svg>
                 Fondo Calibrado
               </span>
-            ) : (
-              'Guardar como Vacío'
-            )}
+            ) : guardando ? 'Sincronizando...' : 'Guardar como Vacío'}
           </button>
         </div>
       </div>
@@ -176,6 +178,7 @@ const s = {
   barraFill: { height: '100%', backgroundColor: '#0284c7', borderRadius: '999px', transition: 'width 0.4s ease' },
   subInfo: { display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#64748b' },
   calibracionGuardada: { display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#166534', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '10px 14px' },
+  errorGuardar: { margin: 0, color: '#b91c1c', fontSize: '0.82rem', lineHeight: '1.4' },
   footer: { display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '6px' },
   btnCancelar: { padding: '9px 18px', borderRadius: '8px', border: '1px solid #cbd5e1', backgroundColor: '#f8fafc', color: '#475569', fontWeight: '600', cursor: 'pointer', fontSize: '0.875rem' },
   btnCapturar: { padding: '9px 20px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)', color: '#fff', fontWeight: '700', cursor: 'pointer', fontSize: '0.875rem', transition: 'background-color 0.2s', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 8px rgba(2, 132, 199, 0.35)' },
