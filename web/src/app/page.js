@@ -92,6 +92,12 @@ export default function Home() {
   }, [])
 
   async function guardarCalibracion(nueva) {
+    if (!supabase) {
+      guardarCalibracionLocal(nueva)
+      setCalibracion(nueva)
+      setErrorSincronizacion('Guardado de forma local (Supabase no está configurado para sincronizar).')
+      return
+    }
     const resultado = await guardarCalibracionCompartida(nueva)
     setCalibracion(resultado.calibracion)
     setErrorSincronizacion('')
