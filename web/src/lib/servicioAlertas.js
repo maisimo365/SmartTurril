@@ -53,6 +53,36 @@ export async function enviarAlertaTelegramWeb(nivel, distanciaCm, umbral = 80) {
 }
 
 /**
+ * Envía una alerta crítica por correo electrónico mediante la API de Next.js
+ */
+export async function enviarAlertaCorreoWeb(nivel, distanciaCm, umbral = 80) {
+  try {
+    const res = await fetch('/api/alertas/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nivel,
+        distanciaCm,
+        umbral,
+        tanqueId: 'smartturril/tanque01',
+      }),
+    });
+
+    const data = await res.json();
+    if (data.ok) {
+      console.log('📧 [Alertas Web] Correo de alerta enviado con éxito.');
+      return { ok: true };
+    } else {
+      console.error('❌ [Alertas Web] Error enviando correo:', data.error);
+      return { ok: false, error: data.error };
+    }
+  } catch (err) {
+    console.error('❌ [Alertas Web] Excepción enviando correo:', err);
+    return { ok: false, error: err.message };
+  }
+}
+
+/**
  * Inserta una lectura periódica en la tabla lecturas_tanque de Supabase
  */
 export async function registrarLecturaSupabase(distanciaCm, nivel, tanqueId = 'tanque01') {

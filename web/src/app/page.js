@@ -5,7 +5,7 @@ import TanqueAgua from '@/components/TanqueAgua'
 import ModalCalibracion, { leerCalibracion } from '@/components/ModalCalibracion'
 import { guardarCalibracionLocal, inicializarCalibracionCompartida, normalizarFilaCalibracion, CALIBRACION_ID, guardarCalibracionCompartida } from '@/lib/calibracion'
 import { supabase } from '@/lib/supabase'
-import { registrarLecturaSupabase, enviarAlertaTelegramWeb } from '@/lib/servicioAlertas'
+import { registrarLecturaSupabase, enviarAlertaTelegramWeb, enviarAlertaCorreoWeb } from '@/lib/servicioAlertas'
 
 export default function Home() {
   const { nivel, distanciaCm, status } = useMQTT()
@@ -69,16 +69,20 @@ export default function Home() {
       })
     }
 
-    // 2. Alerta crítica de Telegram (umbral >= 80% con cooldown de 3 minutos para no saturar)
+    // 2. Alertas críticas (Telegram + Correo si nivel >= 80% con cooldown de 3 minutos)
     const UMBRAL = 80
     if (nivel >= UMBRAL) {
       const COOLDOWN_ALERTA_MS = 3 * 60 * 1000
       if (ahora - ultimaAlertaRef.current >= COOLDOWN_ALERTA_MS) {
         ultimaAlertaRef.current = ahora
-        enviarAlertaTelegramWeb(nivel, distanciaCm, UMBRAL).then((res) => {
-          if (res.ok) {
+        Promise.allSettled([
+          enviarAlertaTelegramWeb(nivel, distanciaCm, UMBRAL),
+          enviarAlertaCorreoWeb(nivel, distanciaCm, UMBRAL),
+        ]).then((resultados) => {
+          const exitosos = resultados.filter((r) => r.status === 'fulfilled' && r.value?.ok)
+          if (exitosos.length > 0) {
             const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            setAlertaEnviadaTexto(`Telegram enviado (${hora})`)
+            setAlertaEnviadaTexto(`Alertas enviadas (${hora})`)
             setTimeout(() => setAlertaEnviadaTexto(''), 10000)
           }
         })
