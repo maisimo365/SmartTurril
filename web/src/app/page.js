@@ -1,22 +1,90 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import useMQTT from '@/hooks/useMQTT'
 import TanqueAgua from '@/components/TanqueAgua'
 import ModalCalibracion, { leerCalibracion } from '@/components/ModalCalibracion'
 import { guardarCalibracionLocal, inicializarCalibracionCompartida, normalizarFilaCalibracion, CALIBRACION_ID, guardarCalibracionCompartida } from '@/lib/calibracion'
 import { supabase } from '@/lib/supabase'
+import { registrarLecturaSupabase, enviarAlertaTelegramWeb } from '@/lib/servicioAlertas'
 
 export default function Home() {
   const { nivel, distanciaCm, status } = useMQTT()
   const [modalAbierto, setModalAbierto] = useState(false)
-  const [calibracion, setCalibracion] = useState(leerCalibracion)
+  const [calibracion, setCalibracion] = useState(null)
   const [errorSincronizacion, setErrorSincronizacion] = useState(
     supabase ? '' : 'Supabase no está configurado; los cambios no se pueden compartir entre dispositivos.',
   )
   const [mostrarTooltip, setMostrarTooltip] = useState(false)
 
+  // Estado del Servicio de Alertas y Registro en la Nube
+  const [alertasActivas, setAlertasActivas] = useState(false)
+  const [ultimoGuardadoTexto, setUltimoGuardadoTexto] = useState('')
+  const [alertaEnviadaTexto, setAlertaEnviadaTexto] = useState('')
+
+  const ultimoGuardadoRef = useRef(0)
+  const ultimaAlertaRef = useRef(0)
+
   const isConnected = status === 'Conectado'
   const isReconnecting = status === 'Reconectando'
+
+  // Carga inicial de preferencias (calibración y activación de alertas)
+  useEffect(() => {
+    const local = leerCalibracion()
+    if (local) {
+      setCalibracion(local)
+    }
+    try {
+      const guardado = localStorage.getItem('smartturril_alertas_activas')
+      if (guardado === 'true') {
+        setAlertasActivas(true)
+      }
+    } catch {}
+  }, [])
+
+  function toggleAlertas() {
+    setAlertasActivas((prev) => {
+      const nuevo = !prev
+      try {
+        localStorage.setItem('smartturril_alertas_activas', String(nuevo))
+      } catch {}
+      return nuevo
+    })
+  }
+
+  // Monitor en vivo: guarda en Supabase cada 30s y dispara Telegram si el nivel es crítico
+  useEffect(() => {
+    if (!alertasActivas) return
+    if (typeof nivel !== 'number') return
+
+    const ahora = Date.now()
+
+    // 1. Guardar en Supabase cada 30 segundos
+    if (ahora - ultimoGuardadoRef.current >= 30000) {
+      ultimoGuardadoRef.current = ahora
+      registrarLecturaSupabase(distanciaCm, nivel).then((res) => {
+        if (res.ok) {
+          const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+          setUltimoGuardadoTexto(hora)
+        }
+      })
+    }
+
+    // 2. Alerta crítica de Telegram (umbral >= 80% con cooldown de 3 minutos para no saturar)
+    const UMBRAL = 80
+    if (nivel >= UMBRAL) {
+      const COOLDOWN_ALERTA_MS = 3 * 60 * 1000
+      if (ahora - ultimaAlertaRef.current >= COOLDOWN_ALERTA_MS) {
+        ultimaAlertaRef.current = ahora
+        enviarAlertaTelegramWeb(nivel, distanciaCm, UMBRAL).then((res) => {
+          if (res.ok) {
+            const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            setAlertaEnviadaTexto(`Telegram enviado (${hora})`)
+            setTimeout(() => setAlertaEnviadaTexto(''), 10000)
+          }
+        })
+      }
+    }
+  }, [nivel, distanciaCm, alertasActivas])
 
   useEffect(() => {
     if (!supabase) {
@@ -213,9 +281,10 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Barra de acción rápida para calibración fuera del encabezado */}
+      {/* Barra de acción rápida para calibración y alertas fuera del encabezado */}
       <div style={styles.subBar} className="smartturril-subbar">
         <div style={styles.subBarContainer}>
+          {/* Lado izquierdo: Botón Calibrar Tanque */}
           <button
             id="btn-calibrar"
             onClick={() => setModalAbierto(true)}
@@ -237,6 +306,43 @@ export default function Home() {
             </svg>
             <span>Calibrar Tanque</span>
           </button>
+
+          {/* Lado derecho: Justo por debajo de la luz del broker MQTT */}
+          <div style={styles.subBarRightGroup}>
+            <button
+              id="btn-alertas"
+              onClick={toggleAlertas}
+              style={{
+                ...styles.btnAlertas,
+                background: alertasActivas
+                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                  : 'linear-gradient(135deg, #26a9e0 0%, #0879c5 100%)',
+                boxShadow: alertasActivas
+                  ? '0 4px 12px rgba(16, 185, 129, 0.35)'
+                  : '0 4px 12px rgba(8, 121, 197, 0.28)',
+              }}
+              className="smartturril-btn-alertas"
+              title={alertasActivas ? "Alertas activadas" : "Activar alertas"}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#ffffff"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                {alertasActivas && (
+                  <circle cx="18" cy="4" r="3" fill="#ef4444" stroke="#ffffff" strokeWidth="1.2" />
+                )}
+              </svg>
+              <span>{alertasActivas ? 'Alertas Activas' : 'Activar Alertas'}</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -464,7 +570,15 @@ const styles = {
     maxWidth: '1180px',
     margin: '0 auto',
     display: 'flex',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '12px',
+    flexWrap: 'wrap',
+  },
+  subBarRightGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
   },
   btnCalibrar: {
     display: 'inline-flex',
@@ -480,6 +594,50 @@ const styles = {
     cursor: 'pointer',
     transition: 'all 0.15s ease',
     boxShadow: '0 4px 12px rgba(8, 121, 197, 0.28)',
+  },
+  btnAlertas: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '10px 18px',
+    border: 'none',
+    borderRadius: '10px',
+    color: '#ffffff',
+    fontSize: '0.85rem',
+    fontWeight: '700',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+  },
+  statusGuardadoWrapper: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '7px 14px',
+    backgroundColor: '#ecfdf5',
+    border: '1px solid #a7f3d0',
+    borderRadius: '8px',
+    fontSize: '0.78rem',
+    color: '#065f46',
+    fontWeight: '600',
+  },
+  pulseDotGreen: {
+    width: '8px',
+    height: '8px',
+    borderRadius: '50%',
+    backgroundColor: '#10b981',
+    boxShadow: '0 0 8px #10b981',
+  },
+  textoGuardado: {
+    color: '#065f46',
+    fontWeight: '600',
+  },
+  badgeAlertaEnviada: {
+    padding: '3px 8px',
+    borderRadius: '6px',
+    backgroundColor: '#dbeafe',
+    color: '#1e40af',
+    fontWeight: '700',
+    fontSize: '0.72rem',
   },
   mainContent: {
     flex: 1,

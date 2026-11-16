@@ -26,7 +26,8 @@ export default function useMQTT() {
         clientId,
         clean: true,
         reconnectPeriod: 5000,
-        connectTimeout: 10000
+        connectTimeout: 10000,
+        keepalive: 30
       })
 
       clientRef.current = client

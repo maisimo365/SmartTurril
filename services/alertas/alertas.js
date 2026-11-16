@@ -79,8 +79,8 @@ client.on('connect', () => {
 client.on('message', async (recvTopic, message) => {
   try {
     const data = JSON.parse(message.toString());
-    const nivelActual = data.nivel;
-    const distancia = data.distancia_cm;
+    const nivelActual = typeof data.nivel === 'number' ? data.nivel : 0;
+    const distancia = typeof data.distancia_cm === 'number' ? data.distancia_cm : (data.distancia ?? 0);
 
     const ahora = Date.now();
     const tiempoDesdeUltimaAlerta = ahora - ultimaAlertaTs;
