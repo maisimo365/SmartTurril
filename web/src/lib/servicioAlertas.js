@@ -1,12 +1,7 @@
 import { supabase } from './supabase';
 
-const TELEGRAM_BOT_TOKEN =
-  process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN ||
-  '8892639187:AAF95OoYHfRARXdq6Od3p5WUKqoPhyTRrrY';
-
-const TELEGRAM_CHAT_ID =
-  process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID ||
-  '7849452272';
+const TELEGRAM_BOT_TOKEN = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID;
 
 /**
  * Envía una alerta crítica a Telegram directamente desde la web (CORS habilitado por Telegram)
