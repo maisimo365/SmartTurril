@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { leerCalibracionLocal } from '@/lib/calibracion';
 const MARGEN_LLENO_CM = 5; // Margen de seguridad superior (punto ciego HC-SR04)
 
@@ -8,18 +8,23 @@ export function leerCalibracion() {
 }
 
 export default function ModalCalibracion({ abierto, distanciaActual, calibracion, onCerrar, onGuardar }) {
-  const [calibracionActual, setCalibracionActual] = useState(leerCalibracion);
+  const [calibracionActual, setCalibracionActual] = useState(null);
   const [ok, setOk] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [errorGuardar, setErrorGuardar] = useState('');
   const [prevAbierto, setPrevAbierto] = useState(abierto);
+
+  useEffect(() => {
+    if (abierto) {
+      setCalibracionActual(calibracion ?? leerCalibracion());
+    }
+  }, [abierto, calibracion]);
 
   if (abierto !== prevAbierto) {
     setPrevAbierto(abierto);
     if (abierto) {
       setOk(false);
       setErrorGuardar('');
-      setCalibracionActual(calibracion ?? leerCalibracion());
     }
   }
 

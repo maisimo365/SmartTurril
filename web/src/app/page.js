@@ -9,7 +9,7 @@ import { supabase } from '@/lib/supabase'
 export default function Home() {
   const { nivel, distanciaCm, status } = useMQTT()
   const [modalAbierto, setModalAbierto] = useState(false)
-  const [calibracion, setCalibracion] = useState(leerCalibracion)
+  const [calibracion, setCalibracion] = useState(null)
   const [errorSincronizacion, setErrorSincronizacion] = useState(
     supabase ? '' : 'Supabase no está configurado; los cambios no se pueden compartir entre dispositivos.',
   )
@@ -17,6 +17,14 @@ export default function Home() {
 
   const isConnected = status === 'Conectado'
   const isReconnecting = status === 'Reconectando'
+
+  // Carga inicial de la calibración local para evitar diferencias de hidratación con SSR
+  useEffect(() => {
+    const local = leerCalibracion()
+    if (local) {
+      setCalibracion(local)
+    }
+  }, [])
 
   useEffect(() => {
     if (!supabase) {

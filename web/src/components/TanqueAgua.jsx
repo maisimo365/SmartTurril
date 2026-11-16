@@ -355,7 +355,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
             {/* ============================================================== */}
             {/* VISOR CENTRAL DE INSPECCIÓN DE NIVEL DE AGUA                   */}
             {/* ============================================================== */}
-            <g id="visor-nivel">
+            <g id="visor-nivel" suppressHydrationWarning>
               {/* Marco y fondo del visor de cristal templado */}
               <rect
                 x="122"
@@ -673,7 +673,7 @@ export default function TanqueAgua({ nivel = 0, distanciaCm = null, calibracion 
               </div>
             </div>
             <div style={styles.tarjetaValorWrapper}>
-              <span style={styles.tarjetaValor}>
+              <span style={styles.tarjetaValor} suppressHydrationWarning>
                 {distanciaActual.toFixed(1)}
               </span>
               <span style={styles.tarjetaUnidad}>cm</span>
