@@ -13,11 +13,15 @@ export async function POST(request) {
     const body = await request.json();
     const { nivel, distanciaCm, umbral = 80, tanqueId = 'tanque01' } = body;
 
+    const cleanPass = (SMTP_PASS || '').replace(/\s+/g, '');
+
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: SMTP_USER,
-        pass: SMTP_PASS,
+        pass: cleanPass,
       },
     });
 

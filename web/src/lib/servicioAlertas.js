@@ -2,12 +2,12 @@ import { supabase } from './supabase';
 
 // Fallbacks seguros decodificados para que funcione en Vercel sin exponer tokens en texto plano
 const DEFAULT_BOT_TOKEN = typeof atob === 'function'
-  ? atob('ODg5MjYzOTE4NzpBQUY5NU9vWUhZUkFSWGRxNk9kM3A1V1VLcW9QaHlUUnJyWQ==')
+  ? atob('ODg5MjYzOTE4NzpBQUY5NU9vWUhmUkFSWGRxNk9kM3A1V1VLcW9QaHlUUnJyWQ==')
   : '';
 const DEFAULT_CHAT_ID = '7849452272';
 
-const TELEGRAM_BOT_TOKEN = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN || DEFAULT_BOT_TOKEN;
-const TELEGRAM_CHAT_ID = process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID || DEFAULT_CHAT_ID;
+const TELEGRAM_BOT_TOKEN = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || DEFAULT_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID || process.env.TELEGRAM_CHAT_ID || DEFAULT_CHAT_ID;
 
 /**
  * Envía una alerta crítica a Telegram directamente desde la web (CORS habilitado por Telegram)
